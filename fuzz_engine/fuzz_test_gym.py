@@ -13,7 +13,7 @@ from f110_gym.envs import F110Env
 from cps_fuzz_tester import SimulationState, run_fuzz_testing
 
 class GapFollower:
-    BUBBLE_RADIUS = 160
+    BUBBLE_RADIUS = 160 # was 260
     PREPROCESS_CONV_SIZE = 3
     BEST_POINT_CONV_SIZE = 80
     MAX_LIDAR_DIST = 3000000
@@ -263,7 +263,7 @@ def main():
 
     F110GymSim.render_on = True
 
-    run_fuzz_testing(F110GymSim)
+    run_fuzz_testing(F110GymSim, always_from_start=True)
 
 if __name__ == '__main__':
     main()

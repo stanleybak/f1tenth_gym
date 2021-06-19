@@ -74,19 +74,15 @@ class Artists:
         ax.add_collection(self.solid_lines)
         self.artist_list.append(self.solid_lines)
         
-        self.dotted_lines = LineCollection([], lw=1, animated=True, color='k', ls=':', zorder=1)
-        ax.add_collection(self.dotted_lines)
-        self.artist_list.append(self.dotted_lines)
-
-        self.rand_pt_marker, = ax.plot([0], [0], 'g--o', lw=1)
+        self.rand_pt_marker, = ax.plot([], [], '--o', color='lime', lw=1)
         self.artist_list.append(self.rand_pt_marker)
 
         self.red_xs_data: Tuple[List[float], List[float]] = ([], [])
-        self.red_xs, = ax.plot([0], [0], 'rx', ms=6, zorder=4)
+        self.red_xs, = ax.plot([], [], 'rx', ms=6, zorder=4)
         self.artist_list.append(self.red_xs)
 
         self.black_xs_data: Tuple[List[float], List[float]] = ([], [])
-        self.black_xs, = ax.plot([0], [0], 'kx', ms=6, zorder=3)
+        self.black_xs, = ax.plot([], [], 'kx', ms=6, zorder=3)
         self.artist_list.append(self.black_xs)
 
         self.init_from_node(root)
@@ -95,12 +91,11 @@ class Artists:
         'initialize artists from root'
 
         solid_paths = self.solid_lines.get_paths()
-        dotted_paths = self.dotted_lines.get_paths()
         
         s = node.state
         sx, sy = node.obs[0:2]
 
-        status = s.get_status()
+        status = node.status
 
         if status == 'error':
             self.add_marker('red_x', node.obs)
@@ -114,11 +109,7 @@ class Artists:
 
                 codes = [Path.MOVETO, Path.LINETO]
                 verts = [(cx, cy), (sx, sy)]
-
-                if child_node.children:
-                    dotted_paths.append(Path(verts, codes))
-                else:
-                    solid_paths.append(Path(verts, codes))
+                solid_paths.append(Path(verts, codes))
 
                 self.init_from_node(child_node)
 
@@ -147,17 +138,34 @@ class Artists:
             self.black_xs_data[0].append(obs[0])
             self.black_xs_data[1].append(obs[1])
             self.black_xs.set_data(*self.black_xs_data)
+
+def is_out_of_bounds(pt, box):
+    'is the pt out of box?'
+
+    rv = False
+
+    for x, (lb, ub) in zip(pt, box):
+        if x < lb or x > ub:
+            rv = True
+            break
+
+    return rv
             
 class TreeNode:
     'tree node in search'
 
     sim_state_class: Optional[SimulationState] = None
 
-    def __init__(self, state: SimulationState, parent=None):
+    def __init__(self, state: SimulationState, parent=None, limits_box=None):
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
         
         self.state: SimulationState = state
         self.obs: np.ndarray = state.get_obs()
+        self.status: str = state.get_status()
+
+        if limits_box is not None and is_out_of_bounds(self.obs, limits_box):
+            self.status = 'out_of_bounds'
+        
         self.parent: Optional[TreeNode] = parent
         
         self.children: Dict[str, TreeNode] = {}
@@ -172,48 +180,39 @@ class TreeNode:
 
         return count
 
-    def expand_children(self, artists):
-        'expand all children of this node'
+    def expand_child(self, artists, cmd, obs_limits_box):
+        'expand the given child of this node'
 
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
-        assert not self.children
-        assert self.state.get_status() == 'ok'
+        assert not cmd in self.children
+        assert self.status == 'ok'
 
         solid_paths = artists.solid_lines.get_paths()
-        dotted_paths = artists.dotted_lines.get_paths()
 
         sx, sy = self.obs[0:2]
 
-        for cmd in TreeNode.sim_state_class.get_cmds():
-            child_state = deepcopy(self.state)
-            child_state.step_sim(cmd)
+        child_state = deepcopy(self.state)
+        child_state.step_sim(cmd)
 
-            child_node = TreeNode(child_state, self)
-            self.children[cmd] = child_node
+        child_node = TreeNode(child_state, parent=self, limits_box=obs_limits_box)
+        self.children[cmd] = child_node
 
-            # update marker
-            status = child_state.get_status()
+        # update marker
+        status = child_node.status
 
-            if status == 'error':
-                artists.add_marker('red_x', child_node.obs)
-            elif status == 'stop':
-                artists.add_marker('black_x', child_node.obs)
-            else:
-                assert status == 'ok', f"status was {status}"
+        if status == 'error':
+            artists.add_marker('red_x', child_node.obs)
+        elif status in ['stop', 'out_of_bounds']:
+            artists.add_marker('black_x', child_node.obs)
+        else:
+            assert status == 'ok', f"status was {status}"
 
-            # update drawing, add child to dotted lines
-            cx, cy = child_node.obs[0:2]
+        # update drawing, add child to solid lines
+        cx, cy = child_node.obs[0:2]
 
-            codes = [Path.MOVETO, Path.LINETO]
-            verts = [(cx, cy), (sx, sy)]
-            dotted_paths.append(Path(verts, codes))
-
-        # update drawing; add self to solid lines
-        if self.parent:
-            codes = [Path.MOVETO, Path.LINETO]
-            px, py = self.parent.obs[0:2]
-            verts = [(px, py), (sx, sy)]
-            solid_paths.append(Path(verts, codes))
+        codes = [Path.MOVETO, Path.LINETO]
+        verts = [(cx, cy), (sx, sy)]
+        solid_paths.append(Path(verts, codes))
 
     def find_closest_leaf(self, obs_pt):
         '''return the leaf closest to the passed in observation point
@@ -222,7 +221,7 @@ class TreeNode:
         '''
 
         if not self.children:
-            if self.state.get_status() != 'ok':
+            if self.status != 'ok':
                 min_dist = np.inf
                 min_node = None
             else:
@@ -240,16 +239,6 @@ class TreeNode:
                     min_dist = dist
 
         return min_node, min_dist
-    
-def init_plot():
-    'initialize plotting style'
-
-    matplotlib.use('TkAgg') # set backend
-
-    parent = os.path.dirname(os.path.realpath(__file__))
-    p = os.path.join(parent, 'bak_matplotlib.mlpstyle')
-
-    plt.style.use(['bmh', p])
 
 def random_point(rng, obs_data):
     'generate random point in range for rrt'
@@ -298,61 +287,123 @@ def save_root(filename, root):
     
     print(f"saved {count} nodes ({round(mb, 2)} MB, {round(kb_per, 1)} KB per state) in " + \
           f"{round(1000 * diff, 1)} ms to {filename}")
+
+class TreeSearch:
+    'performs and draws the tree search'
+
+    def __init__(self, seed=0, always_from_start=False):
+        self.always_from_start = always_from_start
+        self.cur_node = None # used if always_from_start = True
+
+        self.rng = np.random.default_rng(seed=seed)
+        self.tree_filename = 'root.pkl'
+        self.root = None
+        self.artists = None
+
+        self.obs_data = TreeNode.sim_state_class.get_obs_data()
+        self.obs_limits_box = tuple((lb, ub) for _, lb, ub in self.obs_data)
         
-def run_fuzz_testing(sim_state_class, seed=0):
-    'run fuzz testing with the given simulation state class'
+        self.fig = None
+        self.ax = None
+        self.init_plot()
 
-    rng = np.random.default_rng(seed=seed)
-    init_plot()
-    
-    obs_data = sim_state_class.get_obs_data()
+    def init_plot(self):
+        'initalize plotting'
 
-    assert len(obs_data) >= 2
+        obs_data = self.obs_data
+        assert len(obs_data) >= 2, "need at least two coordinates to plot"
 
-    fig = plt.figure(figsize=(8, 8))
-    xlim = obs_data[0][1:3]
-    ylim = obs_data[1][1:3]
-    
-    ax = plt.axes(xlim=(xlim[0], xlim[1]), ylim=(ylim[0], ylim[1]))
-    ax.set_xlabel(obs_data[0][0])
-    ax.set_ylabel(obs_data[1][0])
+        matplotlib.use('TkAgg') # set backend
 
-    plt.tight_layout()
+        parent = os.path.dirname(os.path.realpath(__file__))
+        p = os.path.join(parent, 'bak_matplotlib.mlpstyle')
 
-    TreeNode.sim_state_class = sim_state_class
+        plt.style.use(['bmh', p])
 
-    tree_filename = 'root.pkl'
-    root = load_root(tree_filename, sim_state_class)
+        self.fig = plt.figure(figsize=(8, 8))
+        xlim = obs_data[0][1:3]
+        ylim = obs_data[1][1:3]
 
-    artists = Artists(ax, root)
+        self.ax = plt.axes(xlim=(xlim[0], xlim[1]), ylim=(ylim[0], ylim[1]))
+        self.ax.set_xlabel(obs_data[0][0])
+        self.ax.set_ylabel(obs_data[1][0])
 
-    # plot root point
-    plt.plot([root.obs[0]], [root.obs[1]], 'ko', ms=5)
+        plt.tight_layout()
 
-    def animate(frame):
+    def animate(self, frame):
         'animate function for funcAnimation'
 
         if frame > 0:
-            print(f"frame: {frame}")
-
             if frame % 10 == 0:
-                save_root(tree_filename, root)
-            
-            rand_pt = random_point(rng, obs_data)
-        
-            # find closest point in tree
-            node, _ = root.find_closest_leaf(rand_pt)
+                save_root(self.tree_filename, self.root)
 
-            if node is None:
-                print("Node was None!")
+            if self.cur_node is None:
+                # RRT-like strategy
+                rand_pt = random_point(self.rng, self.obs_data)
+
+                # find closest point in tree
+                node, _ = self.root.find_closest_leaf(rand_pt)
+
+                if node is None:
+                    print("Node was None!")
+                else:
+                    self.artists.update_rand_pt_marker(rand_pt, node.obs)
+
+                    # expand all children
+                    for cmd in TreeNode.sim_state_class.get_cmds():
+                        node.expand_child(self.artists, cmd, self.obs_limits_box)
             else:
-                artists.update_rand_pt_marker(rand_pt, node.obs)            
-                node.expand_children(artists)
+                # always from start strategy
+                status = self.cur_node.status
 
-        return artists.artist_list
+                if status != 'ok':
+                    print(f"resetting to root due to cur_node.status: {status}")
+                    self.cur_node = self.root
 
-    anim = animation.FuncAnimation(fig, animate, frames=sys.maxsize, interval=1, blit=True)
-    plt.show()
+                while True:
+                    cmd_list = TreeNode.sim_state_class.get_cmds()
+                    cmd = cmd_list[self.rng.integers(len(cmd_list))]
+
+                    if cmd in self.cur_node.children:
+                        self.cur_node = self.cur_node.children[cmd]
+                    elif self.cur_node.status != 'ok':
+                        self.cur_node = self.root
+                    else:
+                        break
+
+                # expand use_last_node using cmd
+                self.cur_node.expand_child(self.artists, cmd, self.obs_limits_box)
+                self.cur_node = self.cur_node.children[cmd]
+
+                self.artists.update_rand_pt_marker(self.cur_node.obs, self.cur_node.obs)
+
+        return self.artists.artist_list
+
+    def run(self):
+        'run the search'
+
+        self.root = load_root(self.tree_filename, TreeNode.sim_state_class)
+
+        if self.always_from_start:
+            self.cur_node = self.root
+
+        self.artists = Artists(self.ax, self.root)
+
+        # plot root point (not animated)
+        self.ax.plot([self.root.obs[0]], [self.root.obs[1]], 'ko', ms=5)
+
+        anim = animation.FuncAnimation(self.fig, self.animate, frames=sys.maxsize, interval=1, blit=True)
+        plt.show()
+
+def run_fuzz_testing(sim_state_class, seed=0, always_from_start=False):
+    'run fuzz testing with the given simulation state class'
+
+    TreeNode.sim_state_class = sim_state_class
+    search = TreeSearch(seed, always_from_start)
+
+    search.run()
+
+
 
     #while root.get_status() == 'ok':
     #    cmd = cmd_list[rng.integers(len(cmd_list))]
