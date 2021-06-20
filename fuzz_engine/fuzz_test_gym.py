@@ -263,7 +263,7 @@ def main():
 
     F110GymSim.render_on = True
 
-    run_fuzz_testing(F110GymSim, always_from_start=True)
+    run_fuzz_testing(F110GymSim, always_from_start=False)
 
 if __name__ == '__main__':
     main()

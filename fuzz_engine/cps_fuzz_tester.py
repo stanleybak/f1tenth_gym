@@ -19,6 +19,7 @@ from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib.collections import LineCollection
 from matplotlib.path import Path
+from matplotlib.widgets import Button
 
 class SimulationState(ABC):
     'abstract simulation state class'
@@ -70,12 +71,15 @@ class Artists:
     def __init__(self, ax, root):
         self.artist_list = []
 
-        self.solid_lines = LineCollection([], lw=2, animated=True, color='k', zorder=2)
+        self.solid_lines = LineCollection([], lw=2, animated=True, color='k', zorder=1)
         ax.add_collection(self.solid_lines)
         self.artist_list.append(self.solid_lines)
         
-        self.rand_pt_marker, = ax.plot([], [], '--o', color='lime', lw=1)
+        self.rand_pt_marker, = ax.plot([], [], '--o', color='lime', lw=1, zorder=1)
         self.artist_list.append(self.rand_pt_marker)
+
+        self.blue_circle_marker, = ax.plot([], [], 'o', color='b', ms=8, zorder=2)
+        self.artist_list.append(self.blue_circle_marker)
 
         self.red_xs_data: Tuple[List[float], List[float]] = ([], [])
         self.red_xs, = ax.plot([], [], 'rx', ms=6, zorder=4)
@@ -92,7 +96,6 @@ class Artists:
 
         solid_paths = self.solid_lines.get_paths()
         
-        s = node.state
         sx, sy = node.obs[0:2]
 
         status = node.status
@@ -120,6 +123,17 @@ class Artists:
         ys = [rand_pt[1], obs[1]]
 
         self.rand_pt_marker.set_data(xs, ys)
+
+    def update_blue_circle(self, pt):
+        'update random point marker'
+
+        if pt is None:
+            self.blue_circle_marker.set_data([], [])
+        else:
+            xs = [pt[0]]
+            ys = [pt[1]]
+
+            self.blue_circle_marker.set_data(xs, ys)
 
     def add_marker(self, type_str, obs):
         '''add marker
@@ -156,12 +170,14 @@ class TreeNode:
 
     sim_state_class: Optional[SimulationState] = None
 
-    def __init__(self, state: SimulationState, parent=None, limits_box=None):
+    def __init__(self, state: SimulationState, cmd_from_parent=None, parent=None, limits_box=None):
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
         
         self.state: SimulationState = state
         self.obs: np.ndarray = state.get_obs()
         self.status: str = state.get_status()
+        self.limits_box = limits_box
+        self.cmd_from_parent = cmd_from_parent
 
         if limits_box is not None and is_out_of_bounds(self.obs, limits_box):
             self.status = 'out_of_bounds'
@@ -169,6 +185,17 @@ class TreeNode:
         self.parent: Optional[TreeNode] = parent
         
         self.children: Dict[str, TreeNode] = {}
+
+    def get_cmd_list(self):
+        'get commands leading to this node'
+
+        rv = []
+
+        if self.parent:
+            rv = self.parent.get_cmd_list()
+            rv.append(self.cmd_from_parent)
+
+        return rv
 
     def count_nodes(self):
         'return the number of nodes countered recursively'
@@ -194,7 +221,7 @@ class TreeNode:
         child_state = deepcopy(self.state)
         child_state.step_sim(cmd)
 
-        child_node = TreeNode(child_state, parent=self, limits_box=obs_limits_box)
+        child_node = TreeNode(child_state, cmd_from_parent=cmd, parent=self, limits_box=obs_limits_box)
         self.children[cmd] = child_node
 
         # update marker
@@ -214,29 +241,41 @@ class TreeNode:
         verts = [(cx, cy), (sx, sy)]
         solid_paths.append(Path(verts, codes))
 
-    def find_closest_leaf(self, obs_pt):
-        '''return the leaf closest to the passed in observation point
+    def dist(self, p, q):
+        'distance between two points'
+
+        xscale = 1
+        yscale = 1
+
+        if self.limits_box:
+            xscale = self.limits_box[0][1] - self.limits_box[0][0]
+            yscale = self.limits_box[1][1] - self.limits_box[1][0]
+
+        dx = (p[0] - q[0]) / xscale
+        dy = (p[1] - q[1]) / yscale
+
+        return np.linalg.norm([dx, dy])
+
+    def find_closest_leaf(self, obs_pt, only_ok=True):
+        '''return the node closest to the passed in observation point
 
         returns leaf_node, distance
         '''
+        
+        min_node = None
+        min_dist = np.inf
 
         if not self.children:
-            if self.status != 'ok':
-                min_dist = np.inf
-                min_node = None
-            else:
-                min_dist = np.linalg.norm(self.obs - obs_pt)
+            if self.status == 'ok' or not only_ok:
+                min_dist = self.dist(self.obs, obs_pt)
                 min_node = self
-        else:
-            min_node = None
-            min_dist = np.inf
             
-            for c in self.children.values():
-                node, dist = c.find_closest_leaf(obs_pt)
+        for c in self.children.values():
+            node, dist = c.find_closest_leaf(obs_pt, only_ok=only_ok)
 
-                if dist < min_dist:
-                    min_node = node
-                    min_dist = dist
+            if dist < min_dist:
+                min_node = node
+                min_dist = dist
 
         return min_node, min_dist
 
@@ -302,6 +341,8 @@ class TreeSearch:
 
         self.obs_data = TreeNode.sim_state_class.get_obs_data()
         self.obs_limits_box = tuple((lb, ub) for _, lb, ub in self.obs_data)
+
+        self.paused = False
         
         self.fig = None
         self.ax = None
@@ -328,12 +369,69 @@ class TreeSearch:
         self.ax.set_xlabel(obs_data[0][0])
         self.ax.set_ylabel(obs_data[1][0])
 
-        plt.tight_layout()
+        plt.subplots_adjust(bottom=0.2)
+        
+        self.bstart = Button(plt.axes([0.7, 0.05, 0.1, 0.075]), 'Start/Stop')
+        self.bstart.on_clicked(self.button_start_stop)
+
+        self.fig.canvas.mpl_connect('motion_notify_event', self.mouse_move)
+        self.fig.canvas.mpl_connect('button_press_event', self.mouse_click)
+
+        #bprev = Button(axprev, 'Reset')
+        #bprev.on_clicked(self.button_reset)
+
+        #plt.tight_layout()
+
+    def animate_to_node(self, node):
+        'animate to node'
+
+        cmds = node.get_cmd_list()
+
+        state = deepcopy(self.root.state)
+        
+        for cmd in cmds:
+            print(cmd)
+            state.step_sim(cmd)
+
+        print("done!")
+
+    def mouse_click(self, event):
+        'mouse click event callback'
+
+        if self.paused and event.inaxes == self.ax and event.xdata is not None:
+            x, y = event.xdata, event.ydata
+
+            pt = np.array([x, y], dtype=float)
+            node, _ = self.root.find_closest_leaf(pt, only_ok=False)
+
+            self.animate_to_node(node)
+
+    def mouse_move(self, event):
+        'mouse move event callback'
+
+        if self.paused and event.inaxes == self.ax and event.xdata is not None:
+            x, y = event.xdata, event.ydata
+
+            pt = np.array([x, y], dtype=float)
+            node, _ = self.root.find_closest_leaf(pt, only_ok=False)
+
+            self.artists.update_blue_circle(node.obs)
+        else:
+            self.artists.update_blue_circle(None)
+
+    def button_start_stop(self, _event):
+        'start/stop button pressed callback'
+
+        self.paused = not self.paused
+        print(f"Paused: {self.paused}")
+
+        if not self.paused:
+            self.artists.update_blue_circle(None)
 
     def animate(self, frame):
         'animate function for funcAnimation'
 
-        if frame > 0:
+        if frame > 0 and not self.paused:
             if frame % 10 == 0:
                 save_root(self.tree_filename, self.root)
 
@@ -342,7 +440,7 @@ class TreeSearch:
                 rand_pt = random_point(self.rng, self.obs_data)
 
                 # find closest point in tree
-                node, _ = self.root.find_closest_leaf(rand_pt)
+                node, _ = self.root.find_closest_leaf(rand_pt, only_ok=True)
 
                 if node is None:
                     print("Node was None!")
