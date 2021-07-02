@@ -7,30 +7,69 @@ from argparse import Namespace
 
 from pyglet.gl import GL_POINTS, GL_LINES
 
-from pure_pursuit import PurePursuitPlanner
-from pure_pursuit import nearest_point_on_trajectory
+from pure_pursuit import nearest_point_on_trajectory, get_actuation, first_point_on_trajectory_intersecting_circle
 
-class PPPOneLane:
-    'pure pursuit planner with one lane'
+class SmoothPurePursuitPlanner:
+    """
+    Example Planner
+    """
 
-    def __init__(self, conf, lanes, current_lane=1):
+    MAX_COUNTER = 50 # number of frames to smooth trajectories when setting waypoints (100 = 1 second)
+    
+    def __init__(self, conf, wb):
+        self.wheelbase = wb
+        self.conf = conf
+        self.max_reacquire = 20.
 
-        self.ppp = PurePursuitPlanner(conf, conf.wheelbase)
+        # load waypoints
+        self.waypoints = np.loadtxt(conf.wpt_path, delimiter=conf.wpt_delim, skiprows=conf.wpt_rowskip)
+        self.old_waypoints = self.waypoints.copy()
+        self.lane_switch_counter = SmoothPurePursuitPlanner.MAX_COUNTER
+
+    def update_waypoints(self, waypoints):
+        self.old_waypoints = self.waypoints
+        self.waypoints = waypoints
+        self.lane_switch_counter = 0 
+
+    def _get_current_waypoint(self, waypoints, lookahead_distance, position, theta):
+        wpts = np.vstack((self.waypoints[:, self.conf.wpt_xind], self.waypoints[:, self.conf.wpt_yind])).T
+        nearest_point, nearest_dist, t, i = nearest_point_on_trajectory(position, wpts)
         
-        self.ppp.update_waypoints(lanes[:, current_lane*3:current_lane*3+3])
+        if nearest_dist < lookahead_distance:
+            lookahead_point, i2, t2 = first_point_on_trajectory_intersecting_circle(position, lookahead_distance, wpts, i+t, wrap=True)
+            if i2 == None:
+                return None
+            current_waypoint = np.empty((3, ))
+            # x, y
+            current_waypoint[0:2] = wpts[i2, :]
+            # speed
+            current_waypoint[2] = waypoints[i, self.conf.wpt_vind]
+            return current_waypoint
+        elif nearest_dist < self.max_reacquire:
+            return np.append(wpts[i, :], waypoints[i, self.conf.wpt_vind])
+        else:
+            # return fixed value
+            return 4.0, 0
 
-        self.lookahead_distance = conf.lookahead_distance
-        self.vgain = conf.vgain
+    def plan(self, pose_x, pose_y, pose_theta, lookahead_distance, vgain):
+        position = np.array([pose_x, pose_y])
+        
+        lookahead_point = self._get_current_waypoint(self.waypoints, lookahead_distance, position, pose_theta)
+        self.lane_switch_counter += 1
 
-    def plan(self, x, y, theta):
-        'return speed, steer'
+        if self.lane_switch_counter < SmoothPurePursuitPlanner.MAX_COUNTER:
+            lookahead_point_old = self._get_current_waypoint(self.old_waypoints, lookahead_distance, position, pose_theta)
 
-        return self.ppp.plan(x, y, theta, self.lookahead_distance, self.vgain)
+            lookahead_point = np.array(lookahead_point, dtype=float)
+            lookahead_point_old = np.array(lookahead_point_old, dtype=float)
 
-    def update(self, ego_pose, opp_pose):
-        'update state based on observations'
+            frac = self.lane_switch_counter / SmoothPurePursuitPlanner.MAX_COUNTER
+            lookahead_point = lookahead_point * frac + lookahead_point_old * (1 - frac)
 
-        pass
+        speed, steering_angle = get_actuation(pose_theta, lookahead_point, position, lookahead_distance, self.wheelbase)
+        speed = vgain * speed
+
+        return speed, steering_angle
 
 class LaneSwitcherPlanner:
     'planner that combines lane switcher with pure pursuit'
@@ -40,15 +79,16 @@ class LaneSwitcherPlanner:
         num_lanes = int(lanes.shape[1] / 3 - 1)
 
         self.ls = LaneSwitcher(lanes, num_lanes, current_lane)
-        self.ppp = PurePursuitPlanner(conf, conf.wheelbase)
+        self.ppp = SmoothPurePursuitPlanner(conf, conf.wheelbase)
         
         self.ppp.update_waypoints(lanes[:, current_lane*3:current_lane*3+3])
 
-        self.lookahead_distance = conf.lookahead_distance
+        self.lookahead_distance = conf.lookahead_distance * 2
         self.vgain = conf.vgain
 
         self.drawn_waypoints = []
         self.wp_color = [183, 193, 222]
+        self.prev_decision = -1
 
     def plan(self, x, y, theta):
         'return speed, steer'
@@ -64,23 +104,26 @@ class LaneSwitcherPlanner:
         
         decision = ego_switcher.decision(*ego_pose, *opp_pose)
 
-        # update current waypoint being followed
-        if decision == 2:
-            _, d, _, _ = nearest_point_on_trajectory(np.array([ego_pose[0], ego_pose[1]]), lanes[:, -3:-1])
-            if d <= ego_switcher.switch_thresh:
-                planner.update_waypoints(lanes[:, -3:])
-        elif decision == 3:
-            opp_lane = ego_switcher._pose2lane(opp_pose[0], opp_pose[1])
-            # print('opp_lane', opp_lane)
-            planner.update_waypoints(lanes[:, 3*opp_lane:3*opp_lane+3])
-        elif decision == -1 and ego_switcher.current_lane != 0:
-            ego_switcher.current_lane -= 1
-            planner.update_waypoints(lanes[:, 3*ego_switcher.current_lane:3*ego_switcher.current_lane+3])
-        elif decision == 1 and ego_switcher.current_lane < ego_switcher.num_lanes:
-            ego_switcher.current_lane += 1
-            planner.update_waypoints(lanes[:, 3*ego_switcher.current_lane:3*ego_switcher.current_lane+3])
-        else:
-            pass
+        if decision != self.prev_decision:
+            self.prev_decision = decision
+            
+            # update current waypoint being followed
+            if decision == 2:
+                _, d, _, _ = nearest_point_on_trajectory(np.array([ego_pose[0], ego_pose[1]]), lanes[:, -3:-1])
+                if d <= ego_switcher.switch_thresh:
+                    planner.update_waypoints(lanes[:, -3:])
+            elif decision == 3:
+                opp_lane = ego_switcher._pose2lane(opp_pose[0], opp_pose[1])
+                # print('opp_lane', opp_lane)
+                planner.update_waypoints(lanes[:, 3*opp_lane:3*opp_lane+3])
+            elif decision == -1 and ego_switcher.current_lane != 0:
+                ego_switcher.current_lane -= 1
+                planner.update_waypoints(lanes[:, 3*ego_switcher.current_lane:3*ego_switcher.current_lane+3])
+            elif decision == 1 and ego_switcher.current_lane < ego_switcher.num_lanes:
+                ego_switcher.current_lane += 1
+                planner.update_waypoints(lanes[:, 3*ego_switcher.current_lane:3*ego_switcher.current_lane+3])
+
+            
 
     def render_waypoints(self, env_renderer):
         'draw waypoints using EnvRenderer'
@@ -314,6 +357,10 @@ def main():
     laptime = 0.0
     start = time.time()
 
+    frames = 0
+    # 1: opponent goes faster, -1: opponent goes slower, 0: opponent speed unmodified
+    input_vector_scale_speed = [-1, -1, 1, 1, 0, 0, 1, 1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 0, 0, 0]
+
     while not done:
         # lane switch decision
 
@@ -328,10 +375,24 @@ def main():
         speed, steer = ego_planner.plan(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0])
         opp_speed, opp_steer = opp_planner.plan(obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1])
 
-        opp_cripple = 1.0 # 0.9
+        frames += 1
+        input_index = frames // 100
+
+        if input_index >= len(input_vector_scale_speed):
+            print("finished processing input vector")
+            break
+
+        scale_speed = input_vector_scale_speed[input_index]
+        
+        opp_speed_multiplier = 1.0
+
+        if scale_speed == -1:
+            opp_speed_multiplier = 0.9
+        elif scale_speed == 1:
+            opp_speed_multiplier = 1.1
         
         obs, step_reward, done, info = env.step(np.array([[steer, speed],
-                                                          [opp_steer, opp_speed * opp_cripple]]))
+                                                          [opp_steer, opp_speed * opp_speed_multiplier]]))
         laptime += step_reward
         
         
