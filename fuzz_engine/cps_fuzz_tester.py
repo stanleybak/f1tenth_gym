@@ -218,65 +218,12 @@ class TreeNode:
 
         sx, sy = self.obs[0:2]
 
-        print(f"\nexpand_child() called with cmd: {cmd}")
-        print(f"stored next command: {self.state.next_cmds}")
-
-        node = self
-
-        while node is not None:
-            print(f"parent obs state: {node.obs}")
-            node = node.parent
-
         child_state = deepcopy(self.state)
 
         child_state.step_sim(cmd, debug=True)
-        print(f"after step_sim(), child observed state: {child_state.get_obs()}")
 
         child_node = TreeNode(child_state, cmd_from_parent=cmd, parent=self, limits_box=obs_limits_box)
         self.children[cmd] = child_node
-
-        ########################33
-        print("DEBUG: Checking path from root...")
-        cmds = child_node.get_cmd_list()
-        print(f"cmds: {cmds}")
-
-        # find root
-        root = self
-
-        while root.parent is not None:
-            root = root.parent
-        
-        state = deepcopy(root.state)
-        
-        for i, c in enumerate(cmds):
-            print(f"replay obs state: {state.get_obs()}")
-
-            #debug = i == len(cmds) - 1
-            debug = False
-
-            if debug:
-                print(f"in replay, stored next command: {state.next_cmds}")
-            
-            state.step_sim(c, debug=debug)
-
-        resim_obs = state.get_obs()
-
-        print(f"re-simulate observed state: {resim_obs}")
-
-        if not np.allclose(child_node.state.get_obs(), resim_obs):
-            print("Error: Path from root mismatch!")
-            exit(1)
-
-        print("Path from root matches.")
-
-        print(f"next cmds from replay: {state.next_cmds}")
-        print(f"next cmds from child: {child_state.next_cmds}")
-
-        if not np.allclose(state.next_cmds, child_state.next_cmds):
-            print("!!!next command mismatch!!!\n\n")
-            exit(1)
-        
-        ##############################3
 
         # update marker
         status = child_node.status

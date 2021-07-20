@@ -184,21 +184,13 @@ class F110GymSim(SimulationState):
         self.env.render(mode='human')
         time.sleep(0.1)
             
-    def step_sim(self, cmd, debug=False):
+    def step_sim(self, cmd):
         'step the simulation state'
 
         assert not self.error
 
         for i in range(100):
             obs, _step_reward, done, _info = self.env.step(np.array(self.next_cmds))
-
-            ###############
-            if debug:
-                ego_x, opp_x = self.env.render_obs['poses_x']
-                ego_y, opp_y = self.env.render_obs['poses_y']
-                
-                #print(f"   {i}. step with cmd={self.next_cmds}, ego: {ego_x, ego_y}, opp: {opp_x, opp_y}")
-                #print(opp_lidar)
 
             if F110GymSim.render_on:
                 self.env.render(mode='human_fast')
@@ -219,9 +211,6 @@ class F110GymSim(SimulationState):
 
             self.next_cmds = [[steer, speed], [opp_steer, opp_speed]]
 
-            if debug and i == 99:
-                print(f"next opp_steer command: {opp_steer}")
-            
         self.num_steps += 1
 
     def get_status(self):
