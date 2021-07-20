@@ -5,7 +5,7 @@ Interface for fuzz tester using gym environment
 import time
 import yaml
 import numpy as np
-
+from math import sqrt
 
 from argparse import Namespace
 from f110_gym.envs import F110Env
@@ -184,7 +184,7 @@ class F110GymSim(SimulationState):
         self.env.render(mode='human')
         time.sleep(0.1)
             
-    def step_sim(self, cmd):
+    def step_sim(self, cmd, debug=False):
         'step the simulation state'
 
         assert not self.error
@@ -192,16 +192,25 @@ class F110GymSim(SimulationState):
         for i in range(100):
             obs, _step_reward, done, _info = self.env.step(np.array(self.next_cmds))
 
+            ###############
+            if debug:
+                ego_x, opp_x = self.env.render_obs['poses_x']
+                ego_y, opp_y = self.env.render_obs['poses_y']
+                
+                print(f"   {i}. step with cmd={self.next_cmds}, ego: {ego_x, ego_y}, opp: {opp_x, opp_y}")
+
             if F110GymSim.render_on:
                 self.env.render(mode='human_fast')
 
             if done:
-                print(f"crashed on step {self.num_steps}")
+                print(f"crashed on step {self.num_steps} substep {i}")
                 self.error = True # crashed!
                 break
 
             ego_lidar = obs['scans'][0]
             opp_lidar = obs['scans'][1]
+
+            print(opp_lidar)
 
             speed, steer = self.ego_planner.process_lidar(ego_lidar)
             opp_speed, opp_steer = self.opp_planner.process_lidar(opp_lidar)
@@ -210,6 +219,9 @@ class F110GymSim(SimulationState):
                 opp_speed *= 0.8
 
             self.next_cmds = [[steer, speed], [opp_steer, opp_speed]]
+
+            if debug and i == 99:
+                print(f"next opp_steer command: {opp_steer}")
             
         self.num_steps += 1
 
@@ -247,16 +259,40 @@ class F110GymSim(SimulationState):
         num_waypoints = self.center_lane.shape[0]
 
         min_dist_sq = np.inf
-        min_index = 0
+        rv = 0
 
-        for i, (x, y) in enumerate(self.center_lane):
-            dist_sq = (x - own_x)*(x - own_x) + (y - own_y)*(y - own_y)
+        # min_dist_sq is the squared sum of the two legs of a triangle
+        # considering two waypoints at a time
+
+        for i in range(len(self.center_lane) - 1):
+            x1, y1 = self.center_lane[i]
+            x2, y2 = self.center_lane[i]
+
+            dx1 = (x1 - own_x)
+            dy1 = (y1 - own_y)
+
+            dx2 = (x2 - own_x)
+            dy2 = (y2 - own_y)
+            
+            dist_sq1 = dx1*dx1 + dy1*dy1
+            dist_sq2 = dx2*dx2 + dy2*dy2
+            dist_sq = dist_sq1 + dist_sq2
 
             if dist_sq < min_dist_sq:
                 min_dist_sq = dist_sq
-                min_index = i
+                # 100 * min_index / num_waypoints
+                
+                rv = 100 * i / num_waypoints
 
-        return 100 * min_index / num_waypoints
+                # add the fraction completed betwen the waypints
+                dist1 = sqrt(dist_sq1)
+                dist2 = sqrt(dist_sq2)
+                frac = dist1 / (dist1 + dist2)
+
+                assert 0.0 <= frac <= 1.0
+                rv += frac / num_waypoints
+
+        return rv
 
 def main():
     'main entry point'
