@@ -139,7 +139,7 @@ class F110GymSim(SimulationState):
             list of 3-tuples, label, min, max
         '''
 
-        return ('Ego Completed Percent', 0, 50), ('Opponent Behind Percent', -2.5, 2.5)
+        return ('Ego Completed Percent', 0, 100), ('Opponent Behind Percent', -1.5, 1.5)
         
     def __init__(self):
         # config
@@ -216,9 +216,13 @@ class F110GymSim(SimulationState):
     def get_status(self):
         "get simulation status. element of ['ok', 'stop', 'error']"
 
+        ego_x, _opp_x = self.env.render_obs['poses_x']
+        ego_y, _opp_y = self.env.render_obs['poses_y']
+        ego_percent = self.percent_completed(ego_x, ego_y)
+
         if self.error:
             rv = 'error'
-        elif self.num_steps >= 20:
+        elif ego_percent > 95:
             rv = 'stop'
         else:
             rv = 'ok'

@@ -105,7 +105,7 @@ class Artists:
         elif status == 'stop':
             self.add_marker('black_x', node.obs)
         else:
-            assert status == 'ok', f"status was {status}"
+            #assert status == 'ok', f"status was {status}"
 
             for child_node in node.children.values():
                 cx, cy = child_node.obs[0:2]
@@ -220,7 +220,7 @@ class TreeNode:
 
         child_state = deepcopy(self.state)
 
-        child_state.step_sim(cmd, debug=True)
+        child_state.step_sim(cmd)
 
         child_node = TreeNode(child_state, cmd_from_parent=cmd, parent=self, limits_box=obs_limits_box)
         self.children[cmd] = child_node
@@ -391,10 +391,7 @@ class TreeSearch:
         state = deepcopy(self.root.state)
         
         for cmd in cmds:
-            print(cmd)
             state.step_sim(cmd)
-
-        print("done!")
 
     def mouse_click(self, event):
         'mouse click event callback'
