@@ -251,7 +251,8 @@ class TreeNode:
         for i, c in enumerate(cmds):
             print(f"replay obs state: {state.get_obs()}")
 
-            debug = i == len(cmds) - 1
+            #debug = i == len(cmds) - 1
+            debug = False
 
             if debug:
                 print(f"in replay, stored next command: {state.next_cmds}")

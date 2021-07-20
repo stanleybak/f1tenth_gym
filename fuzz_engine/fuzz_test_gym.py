@@ -197,7 +197,8 @@ class F110GymSim(SimulationState):
                 ego_x, opp_x = self.env.render_obs['poses_x']
                 ego_y, opp_y = self.env.render_obs['poses_y']
                 
-                print(f"   {i}. step with cmd={self.next_cmds}, ego: {ego_x, ego_y}, opp: {opp_x, opp_y}")
+                #print(f"   {i}. step with cmd={self.next_cmds}, ego: {ego_x, ego_y}, opp: {opp_x, opp_y}")
+                #print(opp_lidar)
 
             if F110GymSim.render_on:
                 self.env.render(mode='human_fast')
@@ -209,8 +210,6 @@ class F110GymSim(SimulationState):
 
             ego_lidar = obs['scans'][0]
             opp_lidar = obs['scans'][1]
-
-            print(opp_lidar)
 
             speed, steer = self.ego_planner.process_lidar(ego_lidar)
             opp_speed, opp_steer = self.opp_planner.process_lidar(opp_lidar)
