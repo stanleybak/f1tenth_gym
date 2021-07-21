@@ -257,29 +257,6 @@ class TreeNode:
 
         return np.linalg.norm([dx, dy])
 
-    def find_closest_leaf(self, obs_pt, only_ok=True):
-        '''return the node closest to the passed in observation point
-
-        returns leaf_node, distance
-        '''
-        
-        min_node = None
-        min_dist = np.inf
-
-        if not self.children:
-            if self.status == 'ok' or not only_ok:
-                min_dist = self.dist(self.obs, obs_pt)
-                min_node = self
-            
-        for c in self.children.values():
-            node, dist = c.find_closest_leaf(obs_pt, only_ok=only_ok)
-
-            if dist < min_dist:
-                min_node = node
-                min_dist = dist
-
-        return min_node, min_dist
-
 def random_point(rng, obs_data):
     'generate random point in range for rrt'
 
@@ -309,6 +286,14 @@ def load_root(filename, sim_state_class):
     print(f"initialized tree with {root.count_nodes()} nodes")
 
     return root
+
+def load_leaves(root):
+    if not root.children and root.status=='ok':
+        return [root]
+    leaves = []
+    for node in root.children.values():
+        leaves+= load_leaves(node)
+    return leaves
 
 def save_root(filename, root):
     'save search tree to pickled file'
@@ -347,6 +332,7 @@ class TreeSearch:
         
         self.fig = None
         self.ax = None
+        self.leaves = []
         self.init_plot()
 
     def init_plot(self):
@@ -400,7 +386,7 @@ class TreeSearch:
             x, y = event.xdata, event.ydata
 
             pt = np.array([x, y], dtype=float)
-            node, _ = self.root.find_closest_leaf(pt, only_ok=False)
+            node, _ = self.find_closest_leaf(pt, only_ok=False)
 
             self.animate_to_node(node)
 
@@ -411,7 +397,7 @@ class TreeSearch:
             x, y = event.xdata, event.ydata
 
             pt = np.array([x, y], dtype=float)
-            node, _ = self.root.find_closest_leaf(pt, only_ok=False)
+            node, _ = self.find_closest_leaf(pt,  only_ok=False)
 
             self.artists.update_blue_circle(node.obs)
         else:
@@ -426,6 +412,17 @@ class TreeSearch:
         if not self.paused:
             self.artists.update_blue_circle(None)
 
+    def find_closest_leaf(self, rand_pt, only_ok=True):
+        minim_dist = np.inf
+        minim_node = None
+        for node in self.leaves:
+            if node.status == 'ok' or not only_ok:
+                dist = node.dist(node.obs, rand_pt)
+                if dist < minim_dist:
+                    minim_dist = dist
+                    minim_node = node
+        return minim_node
+
     def animate(self, frame):
         'animate function for funcAnimation'
 
@@ -438,7 +435,8 @@ class TreeSearch:
                 rand_pt = random_point(self.rng, self.obs_data)
 
                 # find closest point in tree
-                node, _ = self.root.find_closest_leaf(rand_pt, only_ok=True)
+                node = self.find_closest_leaf(rand_pt)
+                self.leaves.remove(node)
 
                 if node is None:
                     print("Node was None!")
@@ -448,6 +446,7 @@ class TreeSearch:
                     # expand all children
                     for cmd in TreeNode.sim_state_class.get_cmds():
                         node.expand_child(self.artists, cmd, self.obs_limits_box)
+                        self.leaves.append(node.children[cmd])
             else:
                 # always from start strategy
                 status = self.cur_node.status
@@ -479,6 +478,7 @@ class TreeSearch:
         'run the search'
 
         self.root = load_root(self.tree_filename, TreeNode.sim_state_class)
+        self.leaves = load_leaves(self.root)
 
         if self.always_from_start:
             self.cur_node = self.root
