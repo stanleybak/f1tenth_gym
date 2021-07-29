@@ -201,41 +201,44 @@ class F110GymSim(SimulationState):
         image_path = map_config_dict['image']
         res = map_config_dict['resolution']
         origin = map_config_dict['origin']
+
+        img = Image.open(image_path)#.transpose(Image.FLIP_TOP_BOTTOM)
+        img = img.convert("RGBA")
+
+        pixdata = img.load()
+
+        width, height = img.size
+        for y in range(height):
+            for x in range(width):
+                if pixdata[x, y] == (255, 255, 255, 255):
+                    pixdata[x, y] = (255, 255, 255, 0)
+
+        img = np.array(img)
+
+        xsize, ysize = img.shape[0:2]
+
+
+
+        print(f"(need -22) origin offset x: {origin[0]}, xsize/2: {xsize/2}")
+        print(f"(need +24) origin offset y: {origin[1]}, ysize/2: {ysize/2}")
         
-        #img = plt.imread(image_path)
-        img = np.array(Image.open(image_path).transpose(Image.FLIP_TOP_BOTTOM))
-        img = img.astype(np.float64)
-
-        img[img <= 128.] = 0.
-        img[img > 128.] = 255.
-        
-        #img[img == 1] = np.nan
-
-        xsize, ysize = img.shape
-
-        print(f"y origin: {origin[1]}, y size: {ysize}, res: {res}")
+        x1 = (origin[0] - xsize / 2) * res# - 22
+        y1 = (origin[1] - ysize / 2) * res# + 24
 
         xsize *= res
         ysize *= res
 
-        x1 = origin[0]*res - xsize/2 
-        y1 = origin[1]*res - ysize/2
-        #x1 = -xsize/2
-        #y1 = -ysize/2
-        
         box = Bbox.from_bounds(x1, y1, xsize, ysize)
         tbox = TransformedBbox(box, ax.transData)
         box_image = BboxImage(tbox, zorder=2)
 
-        #theta_deg = 0.0 #(theta - math.pi / 2) / math.pi * 180 # original image is facing up, not right
-        #img_rotated = ndimage.rotate(img, theta_deg, order=1)
-
         box_image.set_data(img)
         box_image.zorder = 0
+
         ax.add_artist(box_image)
 
-        #ax.set_xlim(x1, x1 + xsize)
-        #ax.set_ylim(y1, y1 + ysize)
+        ax.set_xlim(x1, x1 + xsize)
+        ax.set_ylim(y1, y1 + ysize)
         
         return box_image
 
