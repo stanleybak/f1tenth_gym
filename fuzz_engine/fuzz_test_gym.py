@@ -216,14 +216,9 @@ class F110GymSim(SimulationState):
         img = np.array(img)
 
         xsize, ysize = img.shape[0:2]
-
-
-
-        print(f"(need -22) origin offset x: {origin[0]}, xsize/2: {xsize/2}")
-        print(f"(need +24) origin offset y: {origin[1]}, ysize/2: {ysize/2}")
         
-        x1 = (origin[0] - xsize / 2) * res# - 22
-        y1 = (origin[1] - ysize / 2) * res# + 24
+        x1 = origin[0]
+        y1 = origin[1]
 
         xsize *= res
         ysize *= res
