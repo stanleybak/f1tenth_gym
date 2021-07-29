@@ -219,6 +219,7 @@ class F110GymSim(SimulationState):
         
         x1 = origin[0]
         y1 = origin[1]
+        assert origin[2] == 0
 
         xsize *= res
         ysize *= res
