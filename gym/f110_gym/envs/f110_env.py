@@ -138,6 +138,11 @@ class F110Env(gym.Env):
         except:
             self.timestep = 0.01
 
+        try:
+            self.num_beams = kwargs['num_beams']
+        except:
+            self.num_beams = 1080
+
         # default ego index
         try:
             self.ego_idx = kwargs['ego_idx']
@@ -175,7 +180,7 @@ class F110Env(gym.Env):
         self.start_rot = np.eye(2)
 
         # initiate stuff
-        self.sim = Simulator(self.params, self.num_agents, self.seed)
+        self.sim = Simulator(self.params, self.num_agents, self.seed, num_beams=self.num_beams)
         self.sim.set_map(self.map_path, self.map_ext)
 
         # stateful observations for rendering

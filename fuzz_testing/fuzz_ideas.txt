@@ -1,0 +1,20 @@
+
+idea: rather than just explore branches in code, explore branches in SPACE
+
+Use observation function on simulator state to prduce state -> branch. can be as white box as you want
+
+first idea -> state is 1-d variable: track position... distance around waypoints
+branch is -> opponent on left, opponent on right, opponent in front, opponent behind
+
+test scenario for 1 seconds -> opponent faster, opponent same, opponent slower
+
+so it's like a tree to explore, with some faults being detected,
+
+algorithm:
+run full scenario, at each point put state into history_set
+
+todo: reject function -> if opponent crashes
+
+pick unexplored random node to mutate, mutate and run until approximate repeat found in history_set
+ -> need to define a function -> observation(cur) \exists history
+ -> simple idea, if exists same observation at close position in space in front of current position 
