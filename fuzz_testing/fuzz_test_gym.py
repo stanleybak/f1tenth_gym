@@ -10,6 +10,7 @@ from argparse import Namespace
 from PIL import Image
 
 
+import multiprocessing
 import numpy as np
 import yaml
 from matplotlib.image import BboxImage
@@ -31,6 +32,7 @@ class F110GymSim(SimulationState):
 
     render_on = True
     map_config_dict = None
+    pool = multiprocessing.Pool(2) # for parallel execution of planners
 
     @staticmethod
     def get_cmds():
@@ -46,7 +48,7 @@ class F110GymSim(SimulationState):
             list of 3-tuples, label, min, max
         '''
 
-        return ('Ego Completed Percent', 0, 100), ('Opponent Behind Percent', -1.5, 1.5)
+        return ('Ego Completed Percent', 0, 100), ('Opponent Behind Percent', -2.5, 2.5)
 
     def __init__(self, ego_planner, opp_planner, use_lidar):
         self.ego_planner = ego_planner
@@ -59,7 +61,7 @@ class F110GymSim(SimulationState):
 
         # env = gym.make('f110_gym:f110-v0', map=conf.map_path, map_ext=conf.map_ext, num_agents=2)
 
-        num_beams = 1080 if use_lidar else 32 
+        num_beams = 1080 if use_lidar else 32
         env = F110Env(map=conf.map_path, map_ext=conf.map_ext, num_agents=2, num_beams=num_beams)
 
         map_config_path = f"{conf.map_path}.yaml"
@@ -69,22 +71,22 @@ class F110GymSim(SimulationState):
 
         env.add_render_callback(render_callback)
 
-        obs, _step_reward, done, _info = env.reset(np.array([[conf.sx, conf.sy, conf.stheta],
-                                                            [conf.sx2, conf.sy2, conf.stheta2]]))
-
         lanes = np.loadtxt(conf.wpt_path, delimiter=conf.wpt_delim, skiprows=conf.wpt_rowskip)
         center_lane_index = 1
         self.center_lane = lanes[:, center_lane_index*3:center_lane_index*3+2]
 
         #env.render()
+        self.start_positions = np.array([[conf.sx, conf.sy, conf.stheta],
+                                         [conf.sx2, conf.sy2, conf.stheta2]])
 
-        speed, steer = ego_planner.plan(obs, 0)
-        opp_speed, opp_steer = opp_planner.plan(obs, 1)
+        # doing this will assign render_obs in environment, which is needed at the root
+        env.reset(self.start_positions)
+        self.first_step = True
 
         self.map = conf.map_path
-        self.error = done
+        self.error = False
         self.num_steps = 0
-        self.next_cmds = [[steer, speed], [opp_steer, opp_speed]]
+        self.next_cmds = None
         self.env = env
 
     def get_pickle_name(self):
@@ -150,7 +152,18 @@ class F110GymSim(SimulationState):
 
         assert not self.error
 
-        for i in range(100):
+        for _ in range(100):
+
+            if self.first_step:
+                self.first_step = False
+
+                # reset again, to get obs
+                obs, _step_reward, done, _info = self.env.reset(self.start_positions)
+                speed, steer = self.ego_planner.plan(obs, 0)
+                opp_speed, opp_steer = self.opp_planner.plan(obs, 1)
+                self.next_cmds = [[steer, speed], [opp_steer, opp_speed]]
+
+            assert self.next_cmds is not None
             obs, _step_reward, done, _info = self.env.step(np.array(self.next_cmds))
 
             if F110GymSim.render_on:
@@ -159,7 +172,6 @@ class F110GymSim(SimulationState):
             if done:
                 self.error = True # crashed!
                 break
-
 
             speed, steer = self.ego_planner.plan(obs, 0)
             opp_speed, opp_steer = self.opp_planner.plan(obs, 1)

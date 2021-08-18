@@ -306,11 +306,6 @@ class SmoothBlockingDriver(Driver):
         
         return self.planner.plan(obs['poses_x'][e], obs['poses_y'][e], obs['poses_theta'][e])
 
-    def render_callback(self, env_renderer):
-        "optional callback function for rendering"
-
-        self.planner.render_waypoints(env_renderer)
-
 def main():
     'main entry point'
 

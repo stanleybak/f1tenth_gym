@@ -17,17 +17,33 @@ map_ext: '.png'
 # T5 (Wuerth):
 # T7 (Rindt):
 # Middle section: -51.7582509;52.9369422;6.1060188;
-sx: -0.0440806
-sy: -0.849162
+
+# original:
+#sx: -0.0440806
+#sy: -0.849162
+#stheta: 3.4034118
+
+#sx2: -26.8810112
+#sy2: -8.0811682
+#stheta2: 3.3949863
+
+#sx3: 2.6599770
+#sy3: -0.1246830
+#stheta3: 3.4
+
+
+
+# copied from config.yaml
+sx: -0.044081
+sy: -0.849163
 stheta: 3.4034118
 
-sx2: -26.8810112
-sy2: -8.0811682
+sx2: -3.044081
+sy2: -1.349163
 stheta2: 3.3949863
 
-sx3: 2.6599770
-sy3: -0.1246830
-stheta3: 3.4
+
+
 
 
 # raceline path and indices

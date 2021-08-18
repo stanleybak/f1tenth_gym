@@ -1,0 +1,23 @@
+time;type;message
+1629221898.625981;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629221898.8586333;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.285s)
+1629221898.932758;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629221899.1598463;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.301s)
+1629221899.4115639;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.252s)
+1629221899.6961555;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.285s)
+1629221899.962886;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.267s)
+1629221900.2418928;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.279s)
+1629221900.509324;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.267s)
+1629221900.748663;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.239s)
+1629221901.0096118;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.261s)
+1629221901.2656126;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.256s)
+1629221901.512205;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.247s)
+1629221901.7572546;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.245s)
+1629221902.0259435;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.269s)
+1629221902.2789333;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.253s)
+1629221902.5386493;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.260s)
+1629221902.7728589;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.234s)
+1629221903.0687578;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.296s)
+1629221903.3411262;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.272s)
+1629221903.617836;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.277s)
+1629221903.9117317;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.294s)

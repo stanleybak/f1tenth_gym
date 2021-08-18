@@ -838,7 +838,7 @@ class FrenetPlaner:
 
         return path
 
-    def control(self, pose_x, pose_y, pose_theta, velocity, path):
+    def control(self, controller, pose_x, pose_y, pose_theta, velocity, path):
         vehicle_state = np.array([pose_x, pose_y, pose_theta, velocity])
 
         # Calculate the steering angle and the speed in the controller
@@ -867,32 +867,35 @@ class FrenetDriver(Driver):
         self.planner = FrenetPlaner(conf, 0.17145 + 0.15875)
         self.controller = FrenetControllers(conf, 0.17145 + 0.15875)
 
+        self.control_count = 0
+        self.path = None
+
     def plan(self, obs, ego_index):
         """return speed, steer"""
 
-        ################ HERE !!!!!!!!!!!!!!!!!!!!!!!!!
-
         opp_index = 1 if ego_index == 0 else 0
 
-        e = ego_index
-        o = opp_index
+        x = obs['poses_x'][ego_index]
+        y = obs['poses_y'][ego_index]
+        theta = obs['poses_theta'][ego_index]
+        vels_x = obs['linear_vels_x'][ego_index]
 
-        ego_pose = obs['poses_x'][e], obs['poses_y'][e], obs['poses_theta'][e]
-        opp_pose = obs['poses_x'][o], obs['poses_y'][o], obs['poses_theta'][o]
+        opp_x = obs['poses_x'][opp_index]
+        opp_y = obs['poses_y'][opp_index]
 
-        self.planner.update(ego_pose, opp_pose)
-        
-        return self.planner.plan(obs['poses_x'][e], obs['poses_y'][e], obs['poses_theta'][e])
+        if self.control_count == 0:
+            self.path = self.planner.plan(x, y, theta, vels_x, opp_x, opp_y)
 
-    def render_callback(self, env_renderer):
-        "optional callback function for rendering"
+        self.control_count = (self.control_count + 1) % 15
 
-        self.planner.render_waypoints(env_renderer)
+        speed, steer = self.planner.control(self.controller, x, y, theta, vels_x, self.path)
+
+        return speed, steer
 
 def main():
     'main entry point'
 
-    fuzz_test_gym(SmoothBlockingDriver, use_rrt=True, use_lidar=False, render_on=True)
+    fuzz_test_gym(FrenetDriver, use_rrt=True, use_lidar=False, render_on=True)
 
 if __name__ == "__main__":
     main()

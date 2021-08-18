@@ -1,0 +1,68 @@
+time;type;message
+1629215077.9831526;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215082.302644;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215082.878051;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.261s)
+1629215082.925597;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215083.3259847;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215083.733582;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215084.12873;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215084.6866338;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.253s)
+1629215084.725577;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215085.1210253;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215085.7719898;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.355s)
+1629215085.8055089;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215086.1964839;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215086.7255015;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.245s)
+1629215086.7623239;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215087.165157;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215087.5125165;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215088.0484943;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.239s)
+1629215088.0825768;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215088.474624;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.0742035;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.293s)
+1629215089.1061246;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.1813362;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.3697705;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.214s)
+1629215089.3959389;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.4541738;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.6377563;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.210s)
+1629215089.6708055;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.7194517;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.902003;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.213s)
+1629215089.9348197;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215089.9839435;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215090.1865783;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.221s)
+1629215090.216696;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215090.2670233;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215090.7109513;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.201s)
+1629215090.7385395;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215091.0413756;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215091.4831824;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.186s)
+1629215091.519486;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215092.1199136;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.204s)
+1629215092.1538787;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215092.496906;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215093.0108595;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.225s)
+1629215093.071156;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215093.6355453;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.211s)
+1629215093.6957157;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215094.0716648;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215094.5519447;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.215s)
+1629215094.5955977;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215095.01785;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215095.5343597;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.238s)
+1629215095.5727334;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215095.9372797;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215096.5333815;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215096.9732583;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.185s)
+1629215097.0145042;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215097.38437;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215097.939292;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.296s)
+1629215097.9802268;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215098.2933016;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215098.7565272;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.202s)
+1629215098.808958;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215099.1285245;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215099.432283;WARNING;Too close to object! Entering safety distance... [Follow-Mode]
+1629215099.8468175;WARNING;Warning: One trajectory generation iteration took more than 0.150s (Actual calculation time: 0.186s)
+1629215099.8765528;WARNING;Too close to object! Entering safety distance... [Follow-Mode]

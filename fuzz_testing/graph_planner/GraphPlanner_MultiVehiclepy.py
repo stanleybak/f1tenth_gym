@@ -363,7 +363,7 @@ class GraphBasedPlanner:
         self.zone_example = 0
         self.obj_list_dummy = 0
 
-    def initialize_planner(self,conf):
+    def initialize_planner(self, conf):
         # ----------------------------------------------------------------------------------------------------------------------
         # IMPORT (should not change) -------------------------------------------------------------------------------------------
         # ----------------------------------------------------------------------------------------------------------------------
@@ -504,6 +504,21 @@ class GraphBasedPlanner:
 
         return speed, steering_angle
 
+def render_callback(env_renderer):
+    'custom extra drawing function'
+
+    e = env_renderer
+
+    # update camera to follow car
+    x = e.cars[0].vertices[::2]
+    y = e.cars[0].vertices[1::2]
+    top, bottom, left, right = max(y), min(y), min(x), max(x)
+    e.score_label.x = left
+    e.score_label.y = top - 700
+    e.left = left - 800
+    e.right = right + 800
+    e.top = top + 800
+    e.bottom = bottom - 800
 
 if __name__ == '__main__':
 
@@ -513,6 +528,8 @@ if __name__ == '__main__':
     conf = Namespace(**conf_dict)
 
     env = gym.make('f110_gym:f110-v0', map=conf.map_path, map_ext=conf.map_ext, num_agents=2)
+    env.add_render_callback(render_callback)
+            
     obs, step_reward, done, info = env.reset(np.array([[conf.sx, conf.sy, conf.stheta],[conf.sx2, conf.sy2, conf.stheta2]]))
     env.render()
     planner = GraphBasedPlanner(conf)
@@ -527,7 +544,7 @@ if __name__ == '__main__':
 
         if control_count == 15:
             # Get and gather information about the obstacles
-            obstacle1 = [obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1],obs['linear_vels_x'][0]]
+            obstacle1 = [obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1],obs['linear_vels_x'][1]]
             # Run graph based planner. Receive set of trajectories and final selection
             traj_set, sel_action = planner.plan(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0],obstacle1)
             # Reset Planner counter to zero

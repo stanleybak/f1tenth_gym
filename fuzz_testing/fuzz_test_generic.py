@@ -487,9 +487,15 @@ class TreeSearch:
     def animate_to_node(self, node):
         'animate to node'
 
-        cmds = node.get_cmd_list()
+        cmds: List[str] = []
+        count = 10
 
-        state = deepcopy(self.root.state)
+        while node.parent is not None and count > 0:
+            cmds = [node.cmd_from_parent] + cmds
+            node = node.parent
+            count -= 1
+            
+        state = deepcopy(node.state)
         
         for cmd in cmds:
             state.step_sim(cmd)
@@ -594,7 +600,8 @@ class TreeSearch:
             node, _ = self.root.find_closest_node(rand_pt, open_node_filter_func)
 
             if node is None:
-                print("Closest node was None! (full tree was expanded?)")
+                print("Closest node was None! Full tree was expanded. Paused.")
+                self.paused = True
             else:
                 self.artists.update_rand_pt_marker(rand_pt, node.obs)
 

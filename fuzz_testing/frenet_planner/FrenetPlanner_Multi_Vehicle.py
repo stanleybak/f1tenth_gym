@@ -851,6 +851,7 @@ if __name__ == '__main__':
 
     work = {'mass': 3.463388126201571, 'lf': 0.15597534362552312, 'tlad': 0.82461887897713965, 'vgain': 0.25}
     with open('config_Spielberg_map.yaml') as file:
+    #with open('config.yaml') as file:
         conf_dict = yaml.load(file, Loader=yaml.FullLoader)
     conf = Namespace(**conf_dict)
 
@@ -885,10 +886,10 @@ if __name__ == '__main__':
         laptime += step_reward
         env.render(mode='human_fast')
 
-        if conf_dict['logging'] == 'True':
+        if conf_dict.get('logging') == 'True':
             logging.logging(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0], obs['linear_vels_x'][0],
                             obs['lap_counts'], speed, steer)
 
-    if conf_dict['logging'] == 'True':
+    if conf_dict.get('logging') == 'True':
         pickle.dump(logging, open("datalogging.p", "wb"))
     print('Sim elapsed time:', laptime, 'Real elapsed time:', time.time() - start)
