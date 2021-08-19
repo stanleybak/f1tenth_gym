@@ -499,6 +499,7 @@ class FrenetPlaner:
         self.s0 = 0.0                           # current course position s in the Frenet Frame
         self.calcspline = 0
         self.csp = 0
+        self.centerline = 0
         self.last_best_bath = []
         self.debug_count = 0                    # DEBUG - Counts
         self.debug_array1 = []                  # DEBUG - array for saving numbers
@@ -510,7 +511,10 @@ class FrenetPlaner:
         """
         Loading the x and y waypoints in the "..._raceline.csv" which includes the path to follow
         """
+        #Load waypoints for raceline
         self.waypoints = np.loadtxt(conf.wpt_path, delimiter=conf.wpt_delim, skiprows=conf.wpt_rowskip)
+        # Load waypoints for centerline
+        self.waypoints2 = np.loadtxt(conf.wpt_path2, delimiter=",", skiprows=1)
 
     def is_path_collision(self, path, obs):
         # Vehicle Parameter
@@ -609,13 +613,55 @@ class FrenetPlaner:
 
         return [fplist[i] for i in ok_ind]
 
-    def calc_frenet_paths(self, vehicle_state, c_d, c_d_d, c_d_dd, s0):
+    def calc_frenet_paths(self, vehicle_state, c_d, c_d_d, c_d_dd, s0, centerline_distance, centerline_s, track_width):
+
+        #############################      Precalculations         #############################################
+
+        # Get current velocity from the optimal raceline file and create the target speed in [m/s]
+        s_index = np.argmin(abs(self.csp.s - (s0)))
+        speed_list = self.waypoints[:, 5].tolist()
+        TARGET_SPEED = speed_list[s_index]
+
+        # Get the current Side of the vehicle from the raceline - This is for CLOCKWISE Tracks
+        # Side = -1 -> Right Side of the racline \ Side = 1 -> Left Side of the racline
+        if s_index == self.waypoints.shape[0] - 1:
+            a = np.array([self.waypoints[:, 1][s_index - 1], self.waypoints[:, 2][s_index - 1]])
+            b = np.array([self.waypoints[:, 1][1], self.waypoints[:, 2][1]])
+        else:
+            a = np.array([self.waypoints[:, 1][s_index - 1], self.waypoints[:, 2][s_index - 1]])
+            b = np.array([self.waypoints[:, 1][s_index + 1], self.waypoints[:, 2][s_index + 1]])
+
+        side = np.sign((b[0] - a[0]) * (vehicle_state[1] - a[1]) - (b[1] - a[1]) * (vehicle_state[0] - a[0]))
+        c_d = c_d * side * -1
+
+        # Get the current Side of the vehicle from the centerline- This is for CLOCKWISE Tracks
+        # Side = -1 -> Right Side of the racline \ Side = 1 -> Left Side of the racline
+        s_index_centerline = np.argmin(abs(self.centerline.s - (centerline_s)))
+        if s_index_centerline == self.waypoints2.shape[0] - 1:
+            a2 = np.array([self.waypoints2[:, 0][s_index_centerline  - 1], self.waypoints2[:, 1][s_index_centerline  - 1]])
+            b2 = np.array([self.waypoints2[:, 0][1], self.waypoints2[:, 1][1]])
+        else:
+            a2 = np.array([self.waypoints2[:, 0][s_index_centerline  - 1], self.waypoints2[:, 1][s_index_centerline - 1]])
+            b2 = np.array([self.waypoints2[:, 0][s_index_centerline  + 1], self.waypoints2[:, 1][s_index_centerline + 1]])
+
+        centerline_side = np.sign((b2[0] - a2[0]) * (vehicle_state[1] - a2[1]) - (b2[1] - a2[1]) * (vehicle_state[0] - a2[0]))
 
         #############################      Define  Parameter        #############################################
 
+        # Calculate path width to the left and right
+        safety_distance = 0.20                            # Safety distance to the walls [m]
+        # Calculation if vehicle is on the RIGHT side of the centerline
+        if centerline_side == -1:
+            MAX_PATH_WIDTH_LEFT  = ((track_width/2 + centerline_distance) - safety_distance) * -1       # Maximum planning with to the left [m]
+            MAX_PATH_WIDTH_RIGHT = (track_width/2 - centerline_distance)  - safety_distance              # Maximum planning with to the right [m]
+            #print ("Car is on the Right Side of the Centerline")
+        # Calculation if vehicle is on the LEFT side of the centerline
+        else:
+            MAX_PATH_WIDTH_LEFT  = ((track_width/2 - centerline_distance)  - safety_distance) * -1      # Maximum planning with to the left [m]
+            MAX_PATH_WIDTH_RIGHT = (track_width/2 + centerline_distance)   - safety_distance            # Maximum planning with to the right [m]
+            #print("Car is on the LEFT Side of the Centerline")
+
         # Parameter for the path creation
-        MAX_PATH_WIDTH_LEFT = -1.25         # Maximum planning with to the left [m]
-        MAX_PATH_WIDTH_RIGHT = 1.25         # Maximum planning with to the right [m]
         D_ROAD_W = 0.10                     # Sampling length along the width of the track [m]
         MAX_T = 2.0                         # Max prediction time for the path horizon [m]
         MIN_T = 1.5                         # Min prediction time for the path horizon [m]
@@ -629,25 +675,6 @@ class FrenetPlaner:
         K_D = 100.0                         # Weights for Deviation from the global, optimal raceline
         K_LAT = 1.0                         # Weights for
         K_LON = 50.0                        # Weights for
-
-        #############################      Precalculations         #############################################
-
-        # Get current velocity from the optimal raceline file and create the target speed in [m/s]
-        s_index = np.argmin(abs(self.csp.s - (s0)))
-        speed_list = self.waypoints[:, 5].tolist()
-        TARGET_SPEED = speed_list[s_index]
-
-        # Get the current Side of the vehicle from the raceline - This is for CLOCKWISE Tracks
-        # Side = -1 -> Right Side of the racline \ Side = 1 -> Left Side of the racline
-        if s_index == self.waypoints.shape[0]-1:
-            a = np.array([self.waypoints[:, 1][s_index - 1], self.waypoints[:, 2][s_index - 1]])
-            b = np.array([self.waypoints[:, 1][1], self.waypoints[:, 2][1]])
-        else:
-            a = np.array([self.waypoints[:, 1][s_index - 1], self.waypoints[:, 2][s_index - 1]])
-            b = np.array([self.waypoints[:, 1][s_index + 1], self.waypoints[:, 2][s_index + 1]])
-
-        side = np.sign((b[0] - a[0]) * (vehicle_state[1] - a[1]) - (b[1] - a[1]) * (vehicle_state[0] - a[0]))
-        c_d = c_d * side * -1
 
         # Calculate variable path width
         # TO DO: Based on the current position of the vehicle calculate all the possible path on the track
@@ -750,6 +777,7 @@ class FrenetPlaner:
         # Calculate the cubic spline of the raceline path and create csp object - create it once!
         if self.calcspline == 0:
             self.csp = cubic_spline_planner.Spline2D(self.waypoints[:, 1], self.waypoints[:, 2])
+            self.centerline = cubic_spline_planner.Spline2D(self.waypoints2[:, 0], self.waypoints2[:, 1])
             self.calcspline = 1
 
         # Get current position S on the raceline and distance d to the global raceline
@@ -757,8 +785,13 @@ class FrenetPlaner:
         traj = np.stack((self.csp.s, self.csp.sx.y, self.csp.sy.y), axis=-1)
         self.s0, self.c_d = tph.path_matching_global(traj, state)
 
+        # Get current position S on the centerline and distance d to the centerline
+        traj_centerline = np.stack((self.centerline.s, self.centerline.sx.y, self.centerline.sy.y), axis=-1)
+        self.centerline_s, self.centerline_d = tph.path_matching_global(traj_centerline, state)
+        track_width = 2*self.waypoints2[0,2]
+
         # Calculate the optimal paths in the frenet frame
-        fplist = self.calc_frenet_paths(vehicle_state, self.c_d, self.c_d_d, self.c_d_dd, self.s0)
+        fplist = self.calc_frenet_paths(vehicle_state, self.c_d, self.c_d_d, self.c_d_dd, self.s0, self.centerline_d, self.centerline_s, track_width)
 
         # Transfer all Frenet Paths into the global coordination frame X-Y-Theta
         fplist = self.calc_global_paths(fplist, self.csp, vehicle_state)
@@ -793,6 +826,7 @@ class FrenetPlaner:
             # plt.axis([-40, 2, -10, 10])
             plt.axis([vehicle_state[0] - 10, vehicle_state[0] + 8.5, vehicle_state[1] - 3.5, vehicle_state[1] + 3.5])
             plt.plot(self.waypoints[:, [1]], self.waypoints[:, [2]], linestyle='solid', linewidth=2, color='#005293')
+            plt.plot(self.waypoints2[:, [0]], self.waypoints2[:, [1]], linestyle='dashed', linewidth=2, color='#000293')
             plt.plot(vehicle_state[0], vehicle_state[1], marker='o', color='red')
             for fp in fplist:
                 plt.plot(fp.x, fp.y, linestyle='dashed', linewidth=2, color='#e37222')
@@ -836,7 +870,7 @@ class FrenetPlaner:
         vehicle_state = np.array([pose_x, pose_y, pose_theta, velocity])
 
         # Calculate the steering angle and the speed in the controller
-        speed, steering_angle = controller.PurePursuitController(pose_x, pose_y, pose_theta, 0.55, 0.65, path)
+        speed, steering_angle = controller.PurePursuitController(pose_x, pose_y, pose_theta, 0.82461887897713965, 0.9038203837889, path)
         #steering_angle = controller.Stanlycontroller(vehicle_state, path, self.csp, self.s0)
 
         # print("Current Speed: %2.2f PP Speed: %2.2f Frenet Speed %2.2f" %(velocity, speed, path.s_d[-1]))
@@ -851,7 +885,6 @@ if __name__ == '__main__':
 
     work = {'mass': 3.463388126201571, 'lf': 0.15597534362552312, 'tlad': 0.82461887897713965, 'vgain': 0.25}
     with open('config_Spielberg_map.yaml') as file:
-    #with open('config.yaml') as file:
         conf_dict = yaml.load(file, Loader=yaml.FullLoader)
     conf = Namespace(**conf_dict)
 
@@ -886,10 +919,10 @@ if __name__ == '__main__':
         laptime += step_reward
         env.render(mode='human_fast')
 
-        if conf_dict.get('logging') == 'True':
+        if conf_dict['logging'] == 'True':
             logging.logging(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0], obs['linear_vels_x'][0],
                             obs['lap_counts'], speed, steer)
 
-    if conf_dict.get('logging') == 'True':
-        pickle.dump(logging, open("datalogging.p", "wb"))
+    if conf_dict['logging'] == 'True':
+        pickle.dump(logging, open("../Data_Visualization/datalogging.p", "wb"))
     print('Sim elapsed time:', laptime, 'Real elapsed time:', time.time() - start)

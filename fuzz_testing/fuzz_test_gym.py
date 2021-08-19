@@ -48,7 +48,7 @@ class F110GymSim(SimulationState):
             list of 3-tuples, label, min, max
         '''
 
-        return ('Ego Completed Percent', 0, 100), ('Opponent Behind Percent', -2.5, 2.5)
+        return ('Ego Completed Percent', 0, 20), ('Opponent Behind Percent', -2.5, 2.5)
 
     def __init__(self, ego_planner, opp_planner, use_lidar):
         self.ego_planner = ego_planner

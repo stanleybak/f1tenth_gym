@@ -26,7 +26,7 @@ class SimulationState(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_cmds()->List[str]:
+    def get_cmds() -> List[str]:
         """get a list of commands (strings) that can be passed into step_sim"""
 
     @staticmethod
@@ -110,6 +110,9 @@ class Artists:
         self.obs_blue_circle_marker, = ax.plot([], [], 'o', color='b', ms=8, zorder=2)
         self.artist_list.append(self.obs_blue_circle_marker)
 
+        self.obs_green_circle_marker, = ax.plot([], [], 'o', color='g', ms=6, zorder=3)
+        self.artist_list.append(self.obs_green_circle_marker)
+
         self.map_blue_circle_marker, = map_ax.plot([], [], 'o', color='b', ms=8, zorder=2)
         self.artist_list.append(self.map_blue_circle_marker)
 
@@ -188,6 +191,11 @@ class Artists:
 
             self.obs_blue_circle_marker.set_data(xs, ys)
 
+    def update_obs_green_circle(self, xs, ys):
+        'update in-cache point marker'
+
+        self.obs_green_circle_marker.set_data(xs, ys)
+
     def update_map_blue_circle(self, pt):
         'update random point marker'
 
@@ -245,7 +253,7 @@ class TreeNode:
     def __init__(self, state: SimulationState, cmd_from_parent=None, parent=None, limits_box=None):
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
         
-        self.state: SimulationState = state
+        self.state: Optional[SimulationState] = state
         self.obs: np.ndarray = state.get_obs()
         self.map_pos: np.ndarray = state.get_map_pos()
         
@@ -270,6 +278,21 @@ class TreeNode:
 
         return cmd_list
 
+    def get_cache_key(self) -> str:
+        """get the cache key string for this node"""
+
+        cmd_list = self.get_cmd_list()
+        all_cmds = TreeNode.sim_state_class.get_cmds()
+
+        cmd_indices = [str(all_cmds.index(cmd)) for cmd in cmd_list]
+
+        # using blank string for join is fine as long as num commands < 10
+        assert len(all_cmds) < 10
+        
+        cache_key = "".join(cmd_indices)
+        
+        return cache_key
+
     def get_cmd_list(self) -> List[str]:
         """get commands leading to this node from the root, in order"""
 
@@ -291,11 +314,52 @@ class TreeNode:
 
         return count
 
-    def expand_child(self, artists, cmd, obs_limits_box):
+    def reconstruct_state(self, tree_search_obj):
+        """reconstruct self.state"""
+
+        assert self.state is None
+
+        cur_node = self
+        node_list = []
+
+        while True:
+            node_list.insert(0, cur_node)
+
+            # root should always have state
+            assert cur_node.parent is not None
+            cur_node = cur_node.parent
+
+            if cur_node.state is not None:
+                break
+
+        # replay cmd_list starting from node, inserting into cache if needed
+        cur_state = deepcopy(cur_node.state)
+
+        for node in node_list:
+            cmd = node.cmd_from_parent
+
+            cur_state.step_sim(cmd)
+
+            cur_obs = cur_state.get_obs()
+
+            assert np.allclose(cur_obs, node.obs)
+            assert cur_state.get_status() == 'ok'
+
+            # avoid a copy for self
+            node.state = cur_state if node is self else deepcopy(cur_state)
+
+            tree_search_obj.add_to_cache(node)
+
+        assert self.state is not None
+
+    def expand_child(self, tree_search_obj, cmd):
         """expand the given child of this node"""
 
+        artists = tree_search_obj.artists
+        obs_limits_box = tree_search_obj.obs_limits_box
+
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
-        assert not cmd in self.children
+        assert cmd not in self.children
         assert self.status == 'ok'
 
         obs_solid_paths = artists.obs_solid_lines.get_paths()
@@ -303,6 +367,12 @@ class TreeNode:
 
         sx, sy = self.obs[0:2]
         smapx, smapy = self.map_pos
+
+        # reconstruct self.state if it doesn't exist
+        if self.state is None:
+            self.reconstruct_state(tree_search_obj)
+
+        assert self.state is not None
 
         child_state = deepcopy(self.state)
 
@@ -332,6 +402,11 @@ class TreeNode:
         codes = [Path.MOVETO, Path.LINETO]
         verts = [(cmapx, cmapy), (smapx, smapy)]
         map_solid_paths.append(Path(verts, codes))
+
+        if child_node.state.get_status() == 'ok':
+            tree_search_obj.add_to_cache(child_node)
+        else:
+            child_node.state = None
 
     def dist(self, p, q):
         'distance between two points'
@@ -424,6 +499,12 @@ class TreeSearch:
 
         self.tree_filename = f'cache/root_{classname}_{rrt}_{seed}.pkl'
         self.root = None
+
+        # key is ','.join(cmd_list)
+        # values are guaranteed to have sim_state != None
+        self.node_cache: Dict[str, TreeNode] = {}
+        self.cache_size = 10
+        
         self.artists = None
 
         self.obs_data = TreeNode.sim_state_class.get_obs_data()
@@ -494,6 +575,9 @@ class TreeSearch:
             cmds = [node.cmd_from_parent] + cmds
             node = node.parent
             count -= 1
+
+        if node.state is None:
+            node.reconstruct_state(self)
             
         state = deepcopy(node.state)
         
@@ -526,7 +610,7 @@ class TreeSearch:
             x, y = event.xdata, event.ydata
             pt = np.array([x, y], dtype=float)
             node = None
-                
+
             if event.inaxes == self.ax:
                 node, _ = self.root.find_closest_node(pt, click_filter_func)
             elif event.inaxes == self.map_ax:
@@ -549,7 +633,7 @@ class TreeSearch:
 
     def animate(self, frame):
         'animate function for funcAnimation'
-        
+
         assert TreeNode.sim_state_class is not None
         assert self.artists is not None
         assert self.root is not None
@@ -557,7 +641,7 @@ class TreeSearch:
         if frame > 0 and not self.paused:
             # sometimes save nodes
             count = self.root.count_nodes()
-            
+
             if count >= 2 * self.last_save_count:
                 self.save_root()
 
@@ -569,11 +653,60 @@ class TreeSearch:
 
         return self.artists.artist_list
 
+    def remove_from_cache(self, node):
+        """remove a node from the cache (and set state to None)"""
+
+        node_key = node.get_cache_key()
+
+        del self.node_cache[node_key]
+
+    def add_to_cache(self, node):
+        """add a treenode to the cache"""
+
+        assert node.state.get_status() == 'ok'
+
+        if len(self.node_cache) >= self.cache_size:
+            key_list = list(self.node_cache.keys())
+
+            # evict one at random
+            index = self.rng.integers(len(key_list))
+            remove_key = key_list[index]
+            assert remove_key != ''  # root shouldn't be in cache
+
+            print(f"removing {remove_key} from node cache")
+
+            remove_node = self.node_cache[remove_key]
+            remove_node.state = None  # clear
+
+            del self.node_cache[remove_key]
+
+        node_key = node.get_cache_key()
+        self.node_cache[node_key] = node
+
+        # update cached states in plot
+        xs = []
+        ys = []
+        for n in self.node_cache.values():
+            assert n.state is not None
+
+            xs.append(n.obs[0])
+            ys.append(n.obs[1])
+
+        assert self.artists is not None
+        self.artists.update_obs_green_circle(xs, ys)
+
     def save_root(self):
         """save root node"""
 
         start = time.perf_counter()
         print("saving... ", end='')
+
+        key_list = list(self.node_cache.keys())
+        cached_states = [self.node_cache[k].state for k in key_list]
+
+        # clear states before saving
+        for k in key_list:
+            self.node_cache[k].state = None
 
         raw = pickle.dumps(self.root)
         mb = len(raw) / 1024 / 1024
@@ -586,86 +719,105 @@ class TreeSearch:
         kb_per = 1024 * mb / count
         self.last_save_count = count
 
+        # retore states after saving
+        for index, k in enumerate(key_list):
+            self.node_cache[k].state = cached_states[index]
+
         print(f"saved {count} nodes ({round(mb, 2)} MB, {round(kb_per, 1)} KB per state) in " +
               f"{round(1000 * diff, 1)} ms to {self.tree_filename}")
+
+    def compute_next_point_rrt(self):
+        """compute next point using rrt"""
+
+        # RRT-like strategy
+        rand_pt = random_point(self.rng, self.obs_data)
+
+        # find closest point in tree
+        node, _ = self.root.find_closest_node(rand_pt, open_node_filter_func)
+
+        if node is None:
+            print("Closest node was None! Full tree was expanded. Paused.")
+            self.paused = True
+        else:
+            self.artists.update_rand_pt_marker(rand_pt, node.obs)
+
+            all_cmds = node.get_open_cmds()
+
+            # if there's only one choice, don't nccd to filter
+            if len(all_cmds) == 1:
+                expand_cmd = None
+            else:
+                expand_cmd = TreeNode.sim_state_class.select_best_cmd(node.obs, rand_pt, all_cmds)
+
+            if expand_cmd is not None:
+                node.expand_child(self, expand_cmd)
+            else:
+                for expand_cmd in all_cmds:
+                    node.expand_child(self, expand_cmd)
+
+    def compute_next_point_from_start(self):
+        """compute next point using always-from-start strategy"""
+
+        # always from start strategy
+        status = self.cur_node.status
+
+        if status != 'ok':
+            print(f"resetting to root due to cur_node.status: {status}")
+            self.cur_node = self.root
+
+        while True:
+            cmd_list = TreeNode.sim_state_class.get_cmds()
+            cmd = cmd_list[self.rng.integers(len(cmd_list))]
+
+            if cmd in self.cur_node.children:
+                self.cur_node = self.cur_node.children[cmd]
+            elif self.cur_node.status != 'ok':
+                self.cur_node = self.root
+            else:
+                break
+
+        # expand use_last_node using cmd
+        self.cur_node.expand_child(self, cmd)
+        self.cur_node = self.cur_node.children[cmd]
+
+        self.artists.update_rand_pt_marker(self.cur_node.obs, self.cur_node.obs)
 
     def compute_next_point(self):
         """compute next point (in animiaton loop)"""
 
         if self.cur_node is None:
-            # RRT-like strategy
-            rand_pt = random_point(self.rng, self.obs_data)
-
-            # find closest point in tree
-            node, _ = self.root.find_closest_node(rand_pt, open_node_filter_func)
-
-            if node is None:
-                print("Closest node was None! Full tree was expanded. Paused.")
-                self.paused = True
-            else:
-                self.artists.update_rand_pt_marker(rand_pt, node.obs)
-
-                all_cmds = node.get_open_cmds()
-
-                # if there's only one choice, don't nccd to filter
-                if len(all_cmds) == 1:
-                    expand_cmd = all_cmds[0]
-                else:
-                    expand_cmd = TreeNode.sim_state_class.select_best_cmd(node.obs, rand_pt, all_cmds)
-
-                if expand_cmd is not None:
-                    node.expand_child(self.artists, expand_cmd, self.obs_limits_box)
-                else:
-                    # default if no application-specific filter is given: try all cmds
-                    for expand_cmd in all_cmds:
-                        node.expand_child(self.artists, expand_cmd, self.obs_limits_box)
+            self.compute_next_point_rrt()
         else:
-            # always from start strategy
-            status = self.cur_node.status
+            self.compute_next_point_from_start()
 
-            if status != 'ok':
-                print(f"resetting to root due to cur_node.status: {status}")
-                self.cur_node = self.root
-
-            while True:
-                cmd_list = TreeNode.sim_state_class.get_cmds()
-                cmd = cmd_list[self.rng.integers(len(cmd_list))]
-
-                if cmd in self.cur_node.children:
-                    self.cur_node = self.cur_node.children[cmd]
-                elif self.cur_node.status != 'ok':
-                    self.cur_node = self.root
-                else:
-                    break
-
-            # expand use_last_node using cmd
-            self.cur_node.expand_child(self.artists, cmd, self.obs_limits_box)
-            self.cur_node = self.cur_node.children[cmd]
-
-            self.artists.update_rand_pt_marker(self.cur_node.obs, self.cur_node.obs)
-
-    def load_root(self, sim_state):
+    def load_root(self, root_sim_state):
         'load root node from pickled file'
 
         # important for initializing renderer
-        self.root = TreeNode(sim_state)
+        self.root = TreeNode(root_sim_state)
+        count = 1
 
         try:
             with open(self.tree_filename, "rb") as f:
                 self.root = pickle.load(f)
+                assert self.root.state is not None
+                count = self.root.count_nodes()
         except FileNotFoundError:
             pass
 
-        count = self.root.count_nodes()
-        print(f"initialized tree with {count} nodes")
+        if count == 1:
+            print("initialized new search tree (1 node)")
+        else:
+            print(f"initialized tree with {count} nodes")
+        
         self.last_save_count = count
 
-    def run(self, sim_state):
+    def run(self, root_sim_state):
         'run the search'
 
         assert self.ax is not None and self.map_ax is not None
 
-        self.load_root(sim_state)
+        self.load_root(root_sim_state)
 
         if self.always_from_start:
             self.cur_node = self.root
