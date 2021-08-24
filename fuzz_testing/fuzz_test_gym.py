@@ -33,6 +33,7 @@ class F110GymSim(SimulationState):
     render_on = True
     map_config_dict = None
     pool = multiprocessing.Pool(2) # for parallel execution of planners
+    obs_limits = [[0, 95], [-1.5, 1.5]]
 
     @staticmethod
     def get_cmds():
@@ -48,14 +49,17 @@ class F110GymSim(SimulationState):
             list of 3-tuples, label, min, max
         '''
 
-        return ('Ego Completed Percent', 0, 20), ('Opponent Behind Percent', -2.5, 2.5)
+        l1, u1 = F110GymSim.obs_limits[0]
+        l2, u2 = F110GymSim.obs_limits[1]
 
-    def __init__(self, ego_planner, opp_planner, use_lidar):
+        return ('Ego Completed Percent', l1, u1), ('Opponent Behind Percent', l2, u2)
+
+    def __init__(self, ego_planner, opp_planner, use_lidar, config_file):
         self.ego_planner = ego_planner
         self.opp_planner = opp_planner
 
         # config
-        with open('config.yaml') as f:
+        with open(config_file) as f:
             conf_dict = yaml.load(f, Loader=yaml.FullLoader)
         conf = Namespace(**conf_dict)
 
@@ -71,7 +75,7 @@ class F110GymSim(SimulationState):
 
         env.add_render_callback(render_callback)
 
-        lanes = np.loadtxt(conf.wpt_path, delimiter=conf.wpt_delim, skiprows=conf.wpt_rowskip)
+        lanes = np.loadtxt(conf.lanes_path, delimiter=conf.lanes_delim, skiprows=conf.wpt_rowskip)
         center_lane_index = 1
         self.center_lane = lanes[:, center_lane_index*3:center_lane_index*3+2]
 
@@ -285,7 +289,7 @@ def render_callback(env_renderer):
     e.top = top + 800
     e.bottom = bottom - 800
     
-def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True):
+def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True, config="config.yaml"):
     'main entry point'
 
     F110GymSim.render_on = render_on
@@ -293,7 +297,7 @@ def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True):
     ego_driver = planner_class()
     opp_driver = planner_class()
 
-    gym_sim = F110GymSim(ego_driver, opp_driver, use_lidar)
+    gym_sim = F110GymSim(ego_driver, opp_driver, use_lidar, config)
 
     run_fuzz_testing(gym_sim, always_from_start=False)
 

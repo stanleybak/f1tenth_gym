@@ -287,9 +287,9 @@ class TreeNode:
         cmd_indices = [str(all_cmds.index(cmd)) for cmd in cmd_list]
 
         # using blank string for join is fine as long as num commands < 10
-        assert len(all_cmds) < 10
+        join_str = "" if len(all_cmds) < 10 else "."
         
-        cache_key = "".join(cmd_indices)
+        cache_key = join_str.join(cmd_indices)
         
         return cache_key
 
@@ -487,7 +487,7 @@ def random_point(rng, obs_data):
 class TreeSearch:
     'performs and draws the tree search'
 
-    def __init__(self, seed, always_from_start, sim_state, max_nodes):
+    def __init__(self, seed, always_from_start, sim_state, max_nodes, cache_size):
         self.always_from_start = always_from_start
         self.cur_node = None # used if always_from_start = True
 
@@ -503,7 +503,7 @@ class TreeSearch:
         # key is ','.join(cmd_list)
         # values are guaranteed to have sim_state != None
         self.node_cache: Dict[str, TreeNode] = {}
-        self.cache_size = 10
+        self.cache_size = cache_size
         
         self.artists = None
 
@@ -680,20 +680,20 @@ class TreeSearch:
 
             del self.node_cache[remove_key]
 
+            # update cached states in plot
+            xs = []
+            ys = []
+            for n in self.node_cache.values():
+                assert n.state is not None
+
+                xs.append(n.obs[0])
+                ys.append(n.obs[1])
+
+            assert self.artists is not None
+            self.artists.update_obs_green_circle(xs, ys)
+
         node_key = node.get_cache_key()
         self.node_cache[node_key] = node
-
-        # update cached states in plot
-        xs = []
-        ys = []
-        for n in self.node_cache.values():
-            assert n.state is not None
-
-            xs.append(n.obs[0])
-            ys.append(n.obs[1])
-
-        assert self.artists is not None
-        self.artists.update_obs_green_circle(xs, ys)
 
     def save_root(self):
         """save root node"""
@@ -852,11 +852,11 @@ def click_filter_func(tree_node: TreeNode) -> bool:
 
     return rv
 
-def run_fuzz_testing(sim_state, seed=0, always_from_start=False, max_nodes=1023):
+def run_fuzz_testing(sim_state, seed=0, always_from_start=False, max_nodes=1023, cache_size=sys.maxsize):
     'run fuzz testing with the given simulation state class'
 
     TreeNode.sim_state_class = type(sim_state)
 
-    search = TreeSearch(seed, always_from_start, sim_state, max_nodes)
+    search = TreeSearch(seed, always_from_start, sim_state, max_nodes, cache_size=cache_size)
 
     search.run(sim_state)

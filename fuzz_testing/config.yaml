@@ -20,6 +20,9 @@ wpt_xind: 0
 wpt_yind: 1
 wpt_vind: 2
 
+lanes_path: './spielberg_lanes.csv'
+lanes_delim: ','
+
 # seed
 seed: 12345
 

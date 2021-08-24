@@ -363,7 +363,7 @@ class GraphBasedPlanner:
         self.zone_example = 0
         self.obj_list_dummy = 0
 
-    def initialize_planner(self, conf):
+    def initialize_planner(self, x, y, theta):
         # ----------------------------------------------------------------------------------------------------------------------
         # IMPORT (should not change) -------------------------------------------------------------------------------------------
         # ----------------------------------------------------------------------------------------------------------------------
@@ -405,10 +405,10 @@ class GraphBasedPlanner:
         #pos_est = refline[0, :]
         #heading_est = np.arctan2(np.diff(refline[0:2, 1]), np.diff(refline[0:2, 0])) - np.pi / 2
 
-        pos_est = np.array([self.conf.sx, self.conf.sy])
-        heading_est = np.array([round(self.conf.stheta - math.pi/2, 7)])
+        pos_est = np.array([x, y])
+        heading_est = np.array([round(theta - math.pi/2, 7)])
 
-        print(f"pos_est: {pos_est}, heading: {heading_est}")
+        #print(f"pos_est: {pos_est}, heading: {heading_est}")
 
         # set start pos
         ltpl_obj.set_startpos(pos_est=pos_est,
@@ -448,7 +448,7 @@ class GraphBasedPlanner:
 
         # -- INITIALIZE PLANNER ----------------------------------------------------------------------------------------
         if self.init_flag == 0:
-            self.ltpl_obj,self.traj_set, self.zone_example, self.obj_list_dummy = self.initialize_planner(self.conf)
+            self.ltpl_obj,self.traj_set, self.zone_example, self.obj_list_dummy = self.initialize_planner(pose_x, pose_y, pose_theta)
             self.init_flag =1
 
         # --------------------------------------------------------------------------------------------------------------
@@ -536,7 +536,10 @@ if __name__ == '__main__':
     env.render()
     planner = GraphBasedPlanner(conf)
     controller = Controllers(conf, 0.17145 + 0.15875)
-    planner2 = PurePursuitPlanner(conf, 0.17145 + 0.15875)
+    
+    #planner2 = PurePursuitPlanner(conf, 0.17145 + 0.15875)
+    planner2 = GraphBasedPlanner(conf)
+    controller2 = Controllers(conf, 0.17145 + 0.15875)
 
     laptime = 0.0
     control_count = 15
@@ -546,14 +549,20 @@ if __name__ == '__main__':
 
         if control_count == 15:
             # Get and gather information about the obstacles
+            obstacle0 = [obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0]]
             obstacle1 = [obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1],obs['linear_vels_x'][1]]
+            
             # Run graph based planner. Receive set of trajectories and final selection
-            traj_set, sel_action = planner.plan(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0],obstacle1)
+            traj_set0, sel_action0 = planner.plan(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0],obstacle1)
+
+            traj_set1, sel_action1 = planner2.plan(obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1],obs['linear_vels_x'][1],obstacle0)
+            
             # Reset Planner counter to zero
             control_count = 0
 
-        speed, steer = planner.control(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0],traj_set, sel_action, controller)
-        speed2, steer2 = planner2.plan(obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1], work['tlad'],work['vgain'])
+        speed, steer = planner.control(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0], traj_set0, sel_action0, controller)
+        speed2, steer2 = planner2.control(obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1],obs['linear_vels_x'][1], traj_set1, sel_action1, controller2)
+        #speed2, steer2 = planner2.plan(obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1], work['tlad'],work['vgain'])
         control_count = control_count + 1
 
         obs, step_reward, done, info = env.step(np.array([[steer, speed],[steer2, speed2]]))

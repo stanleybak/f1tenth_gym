@@ -408,7 +408,7 @@ class GraphBasedPlanner:
         pos_est = np.array([self.conf.sx, self.conf.sy])
         heading_est = np.array([round(self.conf.stheta - math.pi/2, 7)])
 
-        print(f"pos_est: {pos_est}, heading: {heading_est}")
+        #print(f"pos_est: {pos_est}, heading: {heading_est}")
 
         # set start pos
         ltpl_obj.set_startpos(pos_est=pos_est,

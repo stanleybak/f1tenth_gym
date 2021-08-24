@@ -25,7 +25,7 @@ import math
 
 import pickle
 
-from fuzz_test_gym import Driver, fuzz_test_gym
+from fuzz_test_gym import Driver, fuzz_test_gym, F110GymSim
 
 
 @njit(fastmath=False, cache=True)
@@ -320,15 +320,15 @@ class Controllers:
 
 class GraphBasedPlanner:
 
-    def __init__(self, x, y, theta):
+    def __init__(self):
         self.init_flag = 0
-        self.ltpl_obj = 0
+        self.ltpl_obj = None
         self.traj_set = 0
         self.zone_example = 0
         self.obj_list_dummy = 0
 
         # -- INITIALIZE PLANNER ----------------------------------------------------------------------------------------
-        self.ltpl_obj,self.traj_set, self.zone_example, self.obj_list_dummy = self.initialize_planner(x, y, theta)
+        #self.ltpl_obj, self.traj_set, self.zone_example, self.obj_list_dummy = self.initialize_planner(x, y, theta)
 
     def initialize_planner(self, x, y, theta):
         # ----------------------------------------------------------------------------------------------------------------------
@@ -411,6 +411,13 @@ class GraphBasedPlanner:
 
     def plan(self, pose_x, pose_y, pose_theta, velocity, obstacle1):
 
+        if self.ltpl_obj is None:
+            x = pose_x
+            y = pose_y
+            theta = pose_theta
+            
+            self.ltpl_obj, self.traj_set, self.zone_example, self.obj_list_dummy = self.initialize_planner(x, y, theta)
+
         # --------------------------------------------------------------------------------------------------------------
         # ONLINE LOOP --------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
@@ -471,14 +478,12 @@ class GraphBasedPlanner:
 
 class GraphDriver(Driver):
 
-    graph_base = None # graphbase
-
-    def __init__(self, x, y, theta):
+    def __init__(self):
         with open('config_graph.yaml') as file:
             conf_dict = yaml.load(file, Loader=yaml.FullLoader)
         conf = Namespace(**conf_dict)
         
-        self.planner = GraphBasedPlanner(x, y, theta)
+        self.planner = GraphBasedPlanner()
         self.controller = Controllers(conf, 0.17145 + 0.15875)
 
         self.control_count = 0
@@ -487,13 +492,6 @@ class GraphDriver(Driver):
 
     def plan(self, obs, ego_index):
         """return speed, steer"""
-
-        # restore graph object before planning
-        gb = self.planner.ltpl_obj._Graph_LTPL__graph_base
-        
-        if gb._GraphBase__g is None:
-            print("<<< restoring __g in plan()...")
-            gb._GraphBase__g = GraphDriver.offline_graph
 
         opp_index = 1 if ego_index == 0 else 0
 
@@ -521,38 +519,14 @@ class GraphDriver(Driver):
 
         return speed, steer
 
-    def __getstate__(self):
-
-        # custom behavior for deepcopy and pickle
-
-        gb = self.planner.ltpl_obj._Graph_LTPL__graph_base
-        GraphDriver.offline_graph = gb._GraphBase__g
-
-        print(f"g len: {len(pickle.dumps(gb._GraphBase__g, -1))}")
-        print(f"g-orig len: {len(pickle.dumps(gb._GraphBase__g_orig, -1))}")
-
-        print(f"BEFORE pickled state len: {len(pickle.dumps(gb, -1))}")
-
-        #assert gb._GraphBase__g is gb._GraphBase__g_orig
-        gb._GraphBase__g = None
-        gb._GraphBase__g_orig = None
-
-        print(f"AFTER pickled state len: {len(pickle.dumps(gb, -1))}")
-        #exit(1)
-
-        #exit(1)
-
-        state = self.__dict__.copy()
-        return state
-
-
 def main():
     'main entry point'
 
     import warnings
     warnings.filterwarnings('ignore')
 
-    fuzz_test_gym(GraphDriver, True)
+    F110GymSim.obs_limits[1] = [-5, 5]  # use larger relative position range
+    fuzz_test_gym(GraphDriver, use_rrt=True, use_lider=False)
 
 if __name__ == "__main__":
     main()

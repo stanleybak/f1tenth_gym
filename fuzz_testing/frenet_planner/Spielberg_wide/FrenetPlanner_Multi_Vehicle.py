@@ -1,8 +1,3 @@
-"""
-fuzz test for frenet
-"""
-
-
 import time
 import yaml
 import gym
@@ -17,11 +12,10 @@ import cubic_spline_planner
 import trajectory_planning_helpers.path_matching_global as tph
 import trajectory_planning_helpers.side_of_line as sol
 
-from fuzz_test_gym import Driver, fuzz_test_gym
-
 """ 
 Planner Helpers
 """
+
 
 @njit(fastmath=False, cache=True)
 def nearest_point_on_trajectory(point, trajectory):
@@ -493,9 +487,10 @@ class FrenetPlaner:
     (https://www.youtube.com/watch?v=Cj6tAQe7UCY)
     """
 
-    def __init__(self, conf, wb):
+    def __init__(self, conf, env, wb):
         self.wheelbase = wb                     # Wheelbase of the vehicle
         self.conf = conf                        # Current configuration for the gym based on the maps
+        self.env = env                          # Current environment parameter
         self.load_waypoints(conf)               # Waypoints of the raceline
         self.max_reacquire = 20.
         self.c_d = 0.0                          # current lateral position in the Frenet Frame [m]
@@ -525,7 +520,7 @@ class FrenetPlaner:
         # Vehicle Parameter
         RF = 0.430                         # Distance from rear axle front end of vehicle [m]
         RB = 0.105                         # Distance from rear axle back end of vehicle [m]
-        W = 0.31  #self.env.params['width'] 
+        W = self.env.params['width']       # Width of vehicle [m]
 
         # Get the length of the X-Y position vector but select only every Xth point to reduce the calculation
         index = range(0, len(path.x))
@@ -871,7 +866,7 @@ class FrenetPlaner:
 
         return path
 
-    def control(self, controller, pose_x, pose_y, pose_theta, velocity, path):
+    def control(self, pose_x, pose_y, pose_theta, velocity, path):
         vehicle_state = np.array([pose_x, pose_y, pose_theta, velocity])
 
         # Calculate the steering angle and the speed in the controller
@@ -885,49 +880,49 @@ class FrenetPlaner:
 
         return speed, steering_angle
 
-################
 
-class FrenetDriver(Driver):
-    """Driver for frenet planner"""
+if __name__ == '__main__':
 
-    def __init__(self):
-        # config
-        with open('config_wide.yaml') as file:
-            conf_dict = yaml.load(file, Loader=yaml.FullLoader)
-        conf = Namespace(**conf_dict)
-        
-        self.planner = FrenetPlaner(conf, 0.17145 + 0.15875)
-        self.controller = FrenetControllers(conf, 0.17145 + 0.15875)
+    work = {'mass': 3.463388126201571, 'lf': 0.15597534362552312, 'tlad': 0.82461887897713965, 'vgain': 0.25}
+    with open('config_wide_map.yaml') as file:
+        conf_dict = yaml.load(file, Loader=yaml.FullLoader)
+    conf = Namespace(**conf_dict)
 
-        self.control_count = 0
-        self.path = None
+    env = gym.make('f110_gym:f110-v0', map=conf.map_path, map_ext=conf.map_ext, num_agents=2)
+    obs, step_reward, done, info = env.reset(np.array([[conf.sx, conf.sy, conf.stheta],[conf.sx2, conf.sy2, conf.stheta2]]))
+    env.render()
 
-    def plan(self, obs, ego_index):
-        """return speed, steer"""
+    # Creating the Motion planner object that is used in the F1TENTH Gym
+    planner = FrenetPlaner(conf, env, 0.17145 + 0.15875)
+    controller = FrenetControllers(conf, 0.17145 + 0.15875)
+    planner2 = PurePursuitPlanner(conf, 0.17145 + 0.15875)
 
-        opp_index = 1 if ego_index == 0 else 0
+    # Creating a Datalogger object that saves all necessary vehicle data
+    logging = Datalogger(conf)
 
-        x = obs['poses_x'][ego_index]
-        y = obs['poses_y'][ego_index]
-        theta = obs['poses_theta'][ego_index]
-        vels_x = obs['linear_vels_x'][ego_index]
+    laptime = 0.0
+    control_count = 15
+    start = time.time()
 
-        opp_x = obs['poses_x'][opp_index]
-        opp_y = obs['poses_y'][opp_index]
+    while not done:
 
-        if self.control_count == 0:
-            self.path = self.planner.plan(x, y, theta, vels_x, opp_x, opp_y)
+        if control_count == 15:
+            path = planner.plan(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0],obs['linear_vels_x'][0], obs['poses_x'][1], obs['poses_y'][1])
+            control_count = 0
 
-        self.control_count = (self.control_count + 1) % 15
+        speed, steer = planner.control(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0], obs['linear_vels_x'][0],path)
+        speed2, steer2 = planner2.plan(obs['poses_x'][1], obs['poses_y'][1], obs['poses_theta'][1], work['tlad'],
+                                       work['vgain'])
+        control_count = control_count + 1
 
-        speed, steer = self.planner.control(self.controller, x, y, theta, vels_x, self.path)
+        obs, step_reward, done, info = env.step(np.array([[steer, speed],[steer2, speed2]]))
+        laptime += step_reward
+        env.render(mode='human_fast')
 
-        return speed, steer
+        if conf_dict['logging'] == 'True':
+            logging.logging(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0], obs['linear_vels_x'][0],
+                            obs['lap_counts'], speed, steer)
 
-def main():
-    'main entry point'
-
-    fuzz_test_gym(FrenetDriver, use_rrt=True, use_lidar=False, render_on=True, config="config_wide.yaml")
-
-if __name__ == "__main__":
-    main()
+    if conf_dict['logging'] == 'True':
+        pickle.dump(logging, open("../Data_Visualization/datalogging.p", "wb"))
+    print('Sim elapsed time:', laptime, 'Real elapsed time:', time.time() - start)
