@@ -408,7 +408,7 @@ class GraphBasedPlanner:
         pos_est = np.array([self.conf.sx, self.conf.sy])
         heading_est = np.array([round(self.conf.stheta - math.pi/2, 7)])
 
-        print(f"pos_est: {pos_est}, heading: {heading_est}")
+        #print(f"pos_est: {pos_est}, heading: {heading_est}")
 
         # set start pos
         ltpl_obj.set_startpos(pos_est=pos_est,
@@ -529,7 +529,7 @@ if __name__ == '__main__':
         conf_dict = yaml.load(file, Loader=yaml.FullLoader)
     conf = Namespace(**conf_dict)
 
-    env = gym.make('f110_gym:f110-v0', map=conf.map_path, map_ext=conf.map_ext, num_agents=2)
+    env = gym.make('f110_gym:f110-v0', map=conf.map_path, map_ext=conf.map_ext, num_agents=2, num_beams=32)
     env.add_render_callback(render_callback)
             
     obs, step_reward, done, info = env.reset(np.array([[conf.sx, conf.sy, conf.stheta],[conf.sx2, conf.sy2, conf.stheta2]]))
