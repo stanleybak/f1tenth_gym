@@ -99,10 +99,13 @@ class F110GymSim(SimulationState):
         return type(self.ego_planner).__name__
 
     @staticmethod
-    def make_map_artist(ax):
-        """make an artist for plotting the map, usingthe passed-in axis (optional)"""
+    def make_map_artist(ax, map_config_dict=None):
+        """make and return an artist for plotting the map, usingthe passed-in axis (optional)"""
 
-        map_config_dict = F110GymSim.map_config_dict
+        if map_config_dict is None:
+            map_config_dict = F110GymSim.map_config_dict
+
+        assert map_config_dict is not None
 
         # map static map artist
         image_path = map_config_dict['image']
