@@ -8,7 +8,7 @@ import os
 import sys
 import time
 import pickle
-
+from sklearn.cluster import DBSCAN
 from abc import ABC, abstractmethod
 from copy import deepcopy
 
@@ -131,6 +131,17 @@ class Artists:
         self.map_black_xs_data: Tuple[List[float], List[float]] = ([], [])
         self.map_black_xs, = map_ax.plot([], [], 'kx', ms=6, zorder=3)
         self.artist_list.append(self.map_black_xs)
+
+        self.clusters = []
+
+        colors = [plt.cm.Spectral(each)
+                  for each in np.linspace(0, 1, 20)]
+        for i in range(20):
+
+            data, = map_ax.plot([], [], 'o', markerfacecolor=tuple(colors[i]),
+                                        markeredgecolor='k', markersize=7, zorder=5)
+            self.clusters.append(data)
+            self.artist_list.append(self.clusters[i])
 
         assert TreeNode.sim_state_class.make_map_artist is not None
         self.map_artist = TreeNode.sim_state_class.make_map_artist(map_ax)
@@ -557,6 +568,10 @@ class TreeSearch:
         self.bstart = Button(plt.axes([0.7, 0.05, 0.1, 0.075]), 'Start/Stop')
         self.bstart.on_clicked(self.button_start_stop)
 
+        self.bclusters = Button(plt.axes([0.5, 0.05, 0.1, 0.075]), 'Find Clusters')
+        self.bclusters.on_clicked((self.button_clusters))
+
+
         self.fig.canvas.mpl_connect('motion_notify_event', self.mouse_move)
         self.fig.canvas.mpl_connect('button_press_event', self.mouse_click)
 
@@ -630,6 +645,40 @@ class TreeSearch:
         if not self.paused:
             self.artists.update_obs_blue_circle(None)
             self.artists.update_map_blue_circle(None)
+            for i in range(20):
+                self.artists.clusters[i].set_data([], [])
+
+    def button_clusters(self, _event):
+        'start/stop button pressed callback'
+
+        if not self.paused:
+            return
+        crash_nodes = self.find_crashes(self.root)
+        map_obs = self.find_map_obs(crash_nodes)
+        clusters = DBSCAN(eps=3, min_samples=3).fit(map_obs)
+        labels = clusters.labels_
+        unique_labels = set(clusters.labels_)
+
+        for k in unique_labels:
+            class_member_mask = (labels == k)
+            xy = np.array(map_obs)[np.array(class_member_mask)]
+            self.artists.clusters[k].set_data(xy[:,0], xy[:,1])
+        print(map_obs)
+        print (clusters.labels_)
+
+    def find_crashes(self, root):
+        crash_lst = []
+        if root.status != "ok":
+            crash_lst.append(root)
+        for _,child_node in root.children.items():
+            crash_lst+=self.find_crashes(child_node)
+        return crash_lst
+
+    def find_map_obs(self, crash_nodes):
+        map_obs = []
+        for node in crash_nodes:
+            map_obs.append(node.map_pos)
+        return map_obs
 
     def animate(self, frame):
         'animate function for funcAnimation'
