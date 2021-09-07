@@ -2,8 +2,10 @@
 Interface for fuzz tester using gym environment
 '''
 
+from typing import Tuple
 import time
 import abc
+import sys
 
 from math import sqrt
 from argparse import Namespace
@@ -33,13 +35,22 @@ class F110GymSim(SimulationState):
     render_on = True
     map_config_dict = None
     pool = multiprocessing.Pool(2) # for parallel execution of planners
-    obs_limits = [[0, 95], [-1.5, 1.5]]
+    obs_limits = [[0, 95], [-5.0, 5.0]]
+    cmds: Tuple[str, ...] = ('opp_faster', 'opp_slower')
+
+    two_agents = True
 
     @staticmethod
     def get_cmds():
-        'get a list of commands (strings) that can be passed into step_sim'
+        'get a tuple of commands (strings) that can be passed into step_sim'
 
-        return ['opp_faster', 'opp_slower']
+        return F110GymSim.cmds
+
+    @staticmethod
+    def set_nominal():
+        """set to sim only nominal behaviors"""
+
+        F110GymSim.cmds = ('opp_normal', )
 
     @staticmethod
     def get_obs_data():
@@ -56,7 +67,10 @@ class F110GymSim(SimulationState):
 
     def __init__(self, ego_planner, opp_planner, use_lidar, config_file):
         self.ego_planner = ego_planner
-        self.opp_planner = opp_planner
+        two_agents = F110GymSim.two_agents
+        self.two_agents = two_agents
+
+        self.opp_planner = opp_planner if two_agents else None
 
         # config
         with open(config_file) as f:
@@ -66,7 +80,8 @@ class F110GymSim(SimulationState):
         # env = gym.make('f110_gym:f110-v0', map=conf.map_path, map_ext=conf.map_ext, num_agents=2)
 
         num_beams = 1080 if use_lidar else 32
-        env = F110Env(map=conf.map_path, map_ext=conf.map_ext, num_agents=2, num_beams=num_beams)
+        num_agents = 2 if two_agents else 1
+        env = F110Env(map=conf.map_path, map_ext=conf.map_ext, num_agents=num_agents, num_beams=num_beams)
 
         map_config_path = f"{conf.map_path}.yaml"
 
@@ -80,8 +95,10 @@ class F110GymSim(SimulationState):
         self.center_lane = lanes[:, center_lane_index*3:center_lane_index*3+2]
 
         #env.render()
-        self.start_positions = np.array([[conf.sx, conf.sy, conf.stheta],
-                                         [conf.sx2, conf.sy2, conf.stheta2]])
+        start_list = [[conf.sx, conf.sy, conf.stheta]]
+        if two_agents:
+            start_list.append([conf.sx2, conf.sy2, conf.stheta2])
+        self.start_positions = np.array(start_list, dtype=float)
 
         # doing this will assign render_obs in environment, which is needed at the root
         env.reset(self.start_positions)
@@ -167,8 +184,11 @@ class F110GymSim(SimulationState):
                 # reset again, to get obs
                 obs, _step_reward, done, _info = self.env.reset(self.start_positions)
                 speed, steer = self.ego_planner.plan(obs, 0)
-                opp_speed, opp_steer = self.opp_planner.plan(obs, 1)
-                self.next_cmds = [[steer, speed], [opp_steer, opp_speed]]
+                self.next_cmds = [[steer, speed]]
+
+                if self.two_agents:
+                    opp_speed, opp_steer = self.opp_planner.plan(obs, 1)
+                    self.next_cmds.append([opp_steer, opp_speed])
 
             assert self.next_cmds is not None
             obs, _step_reward, done, _info = self.env.step(np.array(self.next_cmds))
@@ -181,22 +201,25 @@ class F110GymSim(SimulationState):
                 break
 
             speed, steer = self.ego_planner.plan(obs, 0)
-            opp_speed, opp_steer = self.opp_planner.plan(obs, 1)
+            self.next_cmds = [[steer, speed]]
 
-            if cmd == 'opp_slower':
-                opp_speed *= 0.8
-            elif cmd == 'opp_faster':
-                opp_speed *= 1.2
+            if self.two_agents:
+                opp_speed, opp_steer = self.opp_planner.plan(obs, 1)
 
-            self.next_cmds = [[steer, speed], [opp_steer, opp_speed]]
+                if cmd == 'opp_slower':
+                    opp_speed *= 0.8
+                elif cmd == 'opp_faster':
+                    opp_speed *= 1.2
+
+                self.next_cmds.append([opp_steer, opp_speed])
 
         self.num_steps += 1
 
     def get_status(self):
         "get simulation status. element of ['ok', 'stop', 'error']"
 
-        ego_x, _opp_x = self.env.render_obs['poses_x']
-        ego_y, _opp_y = self.env.render_obs['poses_y']
+        ego_x = self.env.render_obs['poses_x'][0]
+        ego_y = self.env.render_obs['poses_y'][0]
         ego_percent = self.percent_completed(ego_x, ego_y)
 
         if self.error:
@@ -214,13 +237,19 @@ class F110GymSim(SimulationState):
         currently this is a pair, [perent_completed_ego, dist_opp_percent]
         '''
 
-        ego_x, opp_x = self.env.render_obs['poses_x']
-        ego_y, opp_y = self.env.render_obs['poses_y']
-
+        ego_x = self.env.render_obs['poses_x'][0]
+        ego_y = self.env.render_obs['poses_y'][0]
         ego_percent = self.percent_completed(ego_x, ego_y)
-        opp_percent = self.percent_completed(opp_x, opp_y)
 
-        opp_behind_percent = ego_percent - opp_percent
+        if self.two_agents:
+            opp_x = self.env.render_obs['poses_x'][1]
+            opp_y = self.env.render_obs['poses_y'][1]
+
+            opp_percent = self.percent_completed(opp_x, opp_y)
+
+            opp_behind_percent = ego_percent - opp_percent
+        else:
+            opp_behind_percent = 0
 
         return np.array([ego_percent, opp_behind_percent], dtype=float)
 
@@ -292,9 +321,13 @@ def render_callback(env_renderer):
     e.top = top + 800
     e.bottom = bottom - 800
     
-def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True, config="config.yaml"):
+def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True, config="config.yaml", nominal=False,
+                  single_car=False, cache_size=sys.maxsize):
     'main entry point'
 
+    if single_car:
+        F110GymSim.two_agents = False
+        
     F110GymSim.render_on = render_on
 
     ego_driver = planner_class()
@@ -302,5 +335,5 @@ def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True, c
 
     gym_sim = F110GymSim(ego_driver, opp_driver, use_lidar, config)
 
-    run_fuzz_testing(gym_sim, always_from_start=False)
+    run_fuzz_testing(gym_sim, nominal=nominal, always_from_start=not use_rrt, cache_size=cache_size)
 

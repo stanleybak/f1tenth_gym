@@ -110,7 +110,7 @@ class GapFollowerDriver(Driver):
 def main():
     'main entry point'
 
-    fuzz_test_gym(GapFollowerDriver, True)
+    fuzz_test_gym(GapFollowerDriver, use_rrt=True)
 
 if __name__ == "__main__":
     main()

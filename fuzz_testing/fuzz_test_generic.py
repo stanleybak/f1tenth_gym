@@ -26,8 +26,8 @@ class SimulationState(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_cmds() -> List[str]:
-        """get a list of commands (strings) that can be passed into step_sim"""
+    def get_cmds() -> Tuple[str]:
+        """get a tuple of commands (strings) that can be passed into step_sim"""
 
     @staticmethod
     @abstractmethod
@@ -37,6 +37,11 @@ class SimulationState(ABC):
         returns:
             list of 3-tuples, label, min, max
         """
+
+    @staticmethod
+    @abstractmethod
+    def set_nominal():
+        """set nominal behavior mode (should have deterministic sim), affects get_cmds()"""
 
     def __init__(self, is_root=True):
         """initialize root state (if is_root=True) or blank state (otherwise)"""
@@ -260,6 +265,7 @@ class TreeNode:
     'tree node in search'
 
     sim_state_class: Optional[SimulationState] = None
+    node_counter = 0
 
     def __init__(self, state: SimulationState, cmd_from_parent=None, parent=None, limits_box=None):
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
@@ -278,11 +284,13 @@ class TreeNode:
         self.parent: Optional[TreeNode] = parent
         
         self.children: Dict[str, TreeNode] = {}
+        self.node_index = TreeNode.node_counter
+        TreeNode.node_counter += 1
 
     def get_open_cmds(self) -> List[str]:
         """Get list of unexplored commands from this node"""
 
-        cmd_list = TreeNode.sim_state_class.get_cmds()
+        cmd_list = list(TreeNode.sim_state_class.get_cmds())
 
         for cmd in self.children.keys():
             cmd_list.remove(cmd)
@@ -414,7 +422,7 @@ class TreeNode:
         verts = [(cmapx, cmapy), (smapx, smapy)]
         map_solid_paths.append(Path(verts, codes))
 
-        if child_node.state.get_status() == 'ok':
+        if child_node.status == 'ok':
             tree_search_obj.add_to_cache(child_node)
         else:
             child_node.state = None
@@ -498,7 +506,7 @@ def random_point(rng, obs_data):
 class TreeSearch:
     'performs and draws the tree search'
 
-    def __init__(self, seed, always_from_start, sim_state, max_nodes, cache_size):
+    def __init__(self, seed, nominal, always_from_start, sim_state, max_nodes, cache_size):
         self.always_from_start = always_from_start
         self.cur_node = None # used if always_from_start = True
 
@@ -506,6 +514,12 @@ class TreeSearch:
         self.last_save_count = 0
 
         rrt = 'rrt' if not always_from_start else 'rand'
+        
+        if nominal:
+            rrt = 'nominal'
+            always_from_start = False
+            TreeNode.sim_state_class.set_nominal()
+        
         classname = sim_state.get_pickle_name()
 
         self.tree_filename = f'cache/root_{classname}_{rrt}_{seed}.pkl'
@@ -835,8 +849,10 @@ class TreeSearch:
         """compute next point (in animiaton loop)"""
 
         if self.cur_node is None:
+            assert not self.always_from_start
             self.compute_next_point_rrt()
         else:
+            assert self.always_from_start
             self.compute_next_point_from_start()
 
     def load_root(self, root_sim_state):
@@ -858,7 +874,8 @@ class TreeSearch:
             print("initialized new search tree (1 node)")
         else:
             print(f"initialized tree with {count} nodes")
-        
+
+        TreeNode.node_counter = count
         self.last_save_count = count
 
     def run(self, root_sim_state):
@@ -901,11 +918,11 @@ def click_filter_func(tree_node: TreeNode) -> bool:
 
     return rv
 
-def run_fuzz_testing(sim_state, seed=0, always_from_start=False, max_nodes=1023, cache_size=sys.maxsize):
+def run_fuzz_testing(sim_state, seed=0, nominal=False, always_from_start=False, max_nodes=1023, cache_size=sys.maxsize):
     'run fuzz testing with the given simulation state class'
 
     TreeNode.sim_state_class = type(sim_state)
 
-    search = TreeSearch(seed, always_from_start, sim_state, max_nodes, cache_size=cache_size)
+    search = TreeSearch(seed, nominal, always_from_start, sim_state, max_nodes, cache_size=cache_size)
 
     search.run(sim_state)

@@ -525,8 +525,10 @@ def main():
     import warnings
     warnings.filterwarnings('ignore')
 
-    F110GymSim.obs_limits[1] = [-5, 5]  # use larger relative position range
-    fuzz_test_gym(GraphDriver, use_rrt=True, use_lider=False)
+    F110GymSim.obs_limits[1] = [-10, 10]  # use larger relative position range
+
+    
+    fuzz_test_gym(GraphDriver, use_rrt=True, use_lidar=False)
 
 if __name__ == "__main__":
     main()
