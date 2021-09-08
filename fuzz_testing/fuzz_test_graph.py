@@ -550,7 +550,7 @@ def main():
     GraphDriver.single_car = single_car
     
     fuzz_test_gym(GraphDriver, use_rrt=True, use_lidar=False, nominal=nominal, single_car=single_car,
-                  load_progress_from_file=load_progress_from_file)
+                  load_progress_from_file=load_progress_from_file, cache_size=100)
 
 if __name__ == "__main__":
     main()
