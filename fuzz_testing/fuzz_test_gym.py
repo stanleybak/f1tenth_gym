@@ -322,7 +322,7 @@ def render_callback(env_renderer):
     e.bottom = bottom - 800
     
 def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True, config="config.yaml", nominal=False,
-                  single_car=False, cache_size=sys.maxsize):
+                  single_car=False, load_progress_from_file=True, cache_size=sys.maxsize):
     'main entry point'
 
     if single_car:
@@ -335,5 +335,6 @@ def fuzz_test_gym(planner_class, use_rrt=True, use_lidar=True, render_on=True, c
 
     gym_sim = F110GymSim(ego_driver, opp_driver, use_lidar, config)
 
-    run_fuzz_testing(gym_sim, nominal=nominal, always_from_start=not use_rrt, cache_size=cache_size)
+    run_fuzz_testing(gym_sim, nominal=nominal, always_from_start=not use_rrt, cache_size=cache_size,
+                     load_progress_from_file=load_progress_from_file)
 

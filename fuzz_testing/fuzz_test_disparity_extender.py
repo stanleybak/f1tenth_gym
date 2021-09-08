@@ -45,18 +45,18 @@ class DisparityExtenderDriving:
         traxxas car controlled using a FOCBox. """
         # This is actually "half" of the car width, plus some tolerance.
         # Controls the amount disparities are extended by.
-        self.car_width = 1
+        self.car_width = 0.3 # 0.5 # 1.0
         # This is the difference between two successive LIDAR scan points that
         # can be considered a "disparity". (As a note, at 7m there should be
         # ~0.04m between scan points.)
-        self.disparity_threshold = 0.2
+        self.disparity_threshold = 1.0 # 0.4
         # This is the arc width of the full LIDAR scan data, in degrees
         self.scan_width = 270.0
         # This is the radius to the left or right of the car that must be clear
         # when the car is attempting to turn left or right.
         self.turn_clearance = 0.3
         # This is the maximum steering angle of the car, in degrees.
-        self.max_turn_angle = 34.0
+        self.max_turn_angle = 15.0 #34.0
         # The slowest speed the car will go
         # Good value here is 0.1
         self.min_speed = 0.5
@@ -124,14 +124,13 @@ class DisparityExtenderDriving:
         msg = drive_params()
         msg.angle = 0.5
         msg.velocity = 0.0
-        print("!! run()")
         
         self.pub_drive_param.publish(msg)
         self.pub_drive_param.unregister()
         drop_rate = float(self.dropped_packets) / float(self.total_packets)
-        print( "Done processing. Ran for %fs" % (duration,))
-        print( "Dropped %d/%d (%.02f%%) LIDAR packets." % (self.dropped_packets,
-            self.total_packets, drop_rate * 100.0))
+        #print( "Done processing. Ran for %fs" % (duration,))
+        #print( "Dropped %d/%d (%.02f%%) LIDAR packets." % (self.dropped_packets,
+        #    self.total_packets, drop_rate * 100.0))
         if got_lock:
             self.lock.release()
 
@@ -171,7 +170,7 @@ class DisparityExtenderDriving:
         # constrained distances in situations where we need to turn towards a
         # disparity.
         self.possible_disparity_indices = []
-        print ("Got %d disparities." % (len(disparities),))
+        #print ("Got %d disparities." % (len(disparities),))
         
         for d in disparities:
             a = values[d]
@@ -278,6 +277,7 @@ class DisparityExtenderDriving:
         distance value, relative to the range [distance_low, distance_high]. """
         distance_range = distance_high - distance_low
         ratio = (distance - distance_low) / distance_range
+
         speed_range = speed_high - speed_low
         return speed_low + (speed_range * ratio)
 
@@ -369,9 +369,6 @@ class DisparityExtenderDriving:
         """ This is asynchronously called every time we receive new LIDAR data.
         """
 
-        print(f"got lidar data: {lidar_data.ranges[0:2]}")
-        print(f"{hash(tuple(lidar_data.ranges))}")
-        
         self.total_packets += 1
         # If the lock is currently locked, then previous LIDAR data is still
         # being processed.
@@ -397,13 +394,13 @@ class DisparityExtenderDriving:
         msg.angle = steering_percentage
         msg.velocity = desired_speed
 
-        print(f"publishing msg with angle: {msg.angle}, vel: {msg.velocity}")
+        #print(f"publishing msg with angle: {msg.angle}, vel: {msg.velocity}")
         
         self.pub_drive_param.publish(msg)
         duration = time.time() - start_time
         self.lock.release()
-        print("(took %.02f ms): Target point %.02fm at %.02f degrees: %.02f" % (
-            duration * 1000.0, target_distance, target_angle, steering_percentage))
+        #print("(took %.02f ms): Target point %.02fm at %.02f degrees: %.02f" % (
+        #    duration * 1000.0, target_distance, target_angle, steering_percentage))
 
 class DisparityExtenderDriver(Driver):
     """Driver for smooth blocking planner"""
@@ -432,7 +429,6 @@ class DisparityExtenderDriver(Driver):
         #self.driving_params.angle = params.angle
         #self.driving_params.velocity = params.velocity
 
-
     def plan(self, obs, ego_index):
         """return speed, steer"""
 
@@ -445,17 +441,20 @@ class DisparityExtenderDriver(Driver):
         # ensures it won't get reused elsewhere
         rospy.topics_sub = None
 
-        #self.counter += 1
+        vel = self.driving_params.velocity
+        angle = self.driving_params.angle
 
-        #if self.counter > 2:
-        #    exit(1)
+        if ego_index == 1: # slow opponent car
+            vel *= 1.0
 
-        return self.driving_params.velocity, self.driving_params.angle
+        return vel, angle
 
 def main():
     'main entry point'
 
-    fuzz_test_gym(DisparityExtenderDriver, use_lidar=True, render_on=True)
+    nominal = False
+    single_car = False
+    fuzz_test_gym(DisparityExtenderDriver, use_lidar=True, render_on=True, nominal=nominal, single_car=single_car)
 
 if __name__ == "__main__":
     main()

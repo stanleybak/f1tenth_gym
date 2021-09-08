@@ -855,20 +855,21 @@ class TreeSearch:
             assert self.always_from_start
             self.compute_next_point_from_start()
 
-    def load_root(self, root_sim_state):
+    def load_root(self, root_sim_state, load_progress_from_file):
         'load root node from pickled file'
 
         # important for initializing renderer
         self.root = TreeNode(root_sim_state)
         count = 1
 
-        try:
-            with open(self.tree_filename, "rb") as f:
-                self.root = pickle.load(f)
-                assert self.root.state is not None
-                count = self.root.count_nodes()
-        except FileNotFoundError:
-            pass
+        if load_progress_from_file:
+            try:
+                with open(self.tree_filename, "rb") as f:
+                    self.root = pickle.load(f)
+                    assert self.root.state is not None
+                    count = self.root.count_nodes()
+            except FileNotFoundError:
+                pass
 
         if count == 1:
             print("initialized new search tree (1 node)")
@@ -878,12 +879,12 @@ class TreeSearch:
         TreeNode.node_counter = count
         self.last_save_count = count
 
-    def run(self, root_sim_state):
+    def run(self, root_sim_state, load_progress_from_file):
         'run the search'
 
         assert self.ax is not None and self.map_ax is not None
 
-        self.load_root(root_sim_state)
+        self.load_root(root_sim_state, load_progress_from_file)
 
         if self.always_from_start:
             self.cur_node = self.root
@@ -918,11 +919,12 @@ def click_filter_func(tree_node: TreeNode) -> bool:
 
     return rv
 
-def run_fuzz_testing(sim_state, seed=0, nominal=False, always_from_start=False, max_nodes=1023, cache_size=sys.maxsize):
+def run_fuzz_testing(sim_state, seed=0, nominal=False, always_from_start=False, max_nodes=1023, cache_size=sys.maxsize,
+                     load_progress_from_file=False):
     'run fuzz testing with the given simulation state class'
 
     TreeNode.sim_state_class = type(sim_state)
 
     search = TreeSearch(seed, nominal, always_from_start, sim_state, max_nodes, cache_size=cache_size)
 
-    search.run(sim_state)
+    search.run(sim_state, load_progress_from_file)

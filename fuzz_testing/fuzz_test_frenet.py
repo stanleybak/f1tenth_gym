@@ -815,6 +815,7 @@ class FrenetPlaner:
         # Check if best_path was found - if not use the last path found and use this one as control input
         if not best_path:
             best_path = self.last_best_bath
+            best_path.s_d[-1] *= 0.7
 
         # Update additional paramter
         self.last_best_bath = best_path
@@ -927,7 +928,9 @@ class FrenetDriver(Driver):
 def main():
     'main entry point'
 
-    fuzz_test_gym(FrenetDriver, use_rrt=True, use_lidar=False, render_on=True, config="config_wide.yaml")
+    nominal = True
+    fuzz_test_gym(FrenetDriver, use_rrt=True, use_lidar=False, render_on=True,
+                  nominal=nominal, config="config_wide.yaml")
 
 if __name__ == "__main__":
     main()

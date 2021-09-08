@@ -38,4 +38,4 @@ class Subscriber:
             topics_sub[topic] = []
         topics_sub[topic].append(self)
 
-        print(f".subscriber {topic} len: {len(topics_sub[topic])}")
+        #print(f".subscriber {topic} len: {len(topics_sub[topic])}")
