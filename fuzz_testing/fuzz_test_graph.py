@@ -478,6 +478,8 @@ class GraphBasedPlanner:
 
 class GraphDriver(Driver):
 
+    single_car = False
+
     def __init__(self):
         with open('config_graph.yaml') as file:
             conf_dict = yaml.load(file, Loader=yaml.FullLoader)
@@ -500,14 +502,25 @@ class GraphDriver(Driver):
         theta = obs['poses_theta'][ego_index]
         linear_vels_x = obs['linear_vels_x'][ego_index]
 
-        opp_x = obs['poses_x'][opp_index]
-        opp_y = obs['poses_y'][opp_index]
-        opp_theta = obs['poses_theta'][opp_index]
-        opp_linear_vels_x = obs['linear_vels_x'][opp_index]
 
-        if self.control_count == 0:
+        if GraphDriver.single_car:
+            # far away
+            opp_x = 1000
+            opp_y = 1000
+            opp_theta = 0
+            opp_linear_vels_x = 0
             obstacle1 = [opp_x, opp_y, opp_theta, opp_linear_vels_x]
+            
             self.traj_set, self.sel_action = self.planner.plan(x, y, theta, linear_vels_x, obstacle1)
+        else:
+            opp_x = obs['poses_x'][opp_index]
+            opp_y = obs['poses_y'][opp_index]
+            opp_theta = obs['poses_theta'][opp_index]
+            opp_linear_vels_x = obs['linear_vels_x'][opp_index]
+
+            if self.control_count == 0:
+                obstacle1 = [opp_x, opp_y, opp_theta, opp_linear_vels_x]
+                self.traj_set, self.sel_action = self.planner.plan(x, y, theta, linear_vels_x, obstacle1)
 
         speed, steer = self.planner.control(x, y, theta, linear_vels_x, self.traj_set, self.sel_action, self.controller)
 
@@ -516,6 +529,9 @@ class GraphDriver(Driver):
         if self.control_count == 0:
             self.traj_set = None
             self.sel_action = None
+
+        if ego_index == 1: # slow opponent car
+            speed *= 1.0
 
         return speed, steer
 
@@ -527,8 +543,14 @@ def main():
 
     F110GymSim.obs_limits[1] = [-10, 10]  # use larger relative position range
 
+    nominal = False
+    single_car = False
+    load_progress_from_file = False
+
+    GraphDriver.single_car = single_car
     
-    fuzz_test_gym(GraphDriver, use_rrt=True, use_lidar=False)
+    fuzz_test_gym(GraphDriver, use_rrt=True, use_lidar=False, nominal=nominal, single_car=single_car,
+                  load_progress_from_file=load_progress_from_file)
 
 if __name__ == "__main__":
     main()
