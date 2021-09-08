@@ -512,6 +512,8 @@ class FrenetPlaner:
         self.debug_array3 = []                  # DEBUG - array for saving numbers
         self.debug_array4 = []                  # DEBUG - array for saving numbers
 
+        self.no_best_path = False
+
     def load_waypoints(self, conf):
         """
         Loading the x and y waypoints in the "..._raceline.csv" which includes the path to follow
@@ -815,7 +817,10 @@ class FrenetPlaner:
         # Check if best_path was found - if not use the last path found and use this one as control input
         if not best_path:
             best_path = self.last_best_bath
-            best_path.s_d[-1] *= 0.7
+            self.no_best_path = True
+        else:
+            self.no_best_path = False
+            #best_path.s_d[-1] *= 0.7
 
         # Update additional paramter
         self.last_best_bath = best_path
@@ -893,7 +898,7 @@ class FrenetDriver(Driver):
 
     def __init__(self):
         # config
-        with open('config_wide.yaml') as file:
+        with open('config_wide_map.yaml') as file:
             conf_dict = yaml.load(file, Loader=yaml.FullLoader)
         conf = Namespace(**conf_dict)
         
@@ -923,14 +928,20 @@ class FrenetDriver(Driver):
 
         speed, steer = self.planner.control(self.controller, x, y, theta, vels_x, self.path)
 
+        if self.planner.no_best_path:
+            speed *= 0.7
+
         return speed, steer
 
 def main():
     'main entry point'
 
-    nominal = True
-    fuzz_test_gym(FrenetDriver, use_rrt=True, use_lidar=False, render_on=True,
-                  nominal=nominal, config="config_wide.yaml")
+    nominal = False
+    single_car = False
+    load_progress_from_file = True
+    
+    fuzz_test_gym(FrenetDriver, use_rrt=True, use_lidar=False, render_on=True, single_car=single_car,
+                  nominal=nominal, config="config_wide_map.yaml", load_progress_from_file=load_progress_from_file)
 
 if __name__ == "__main__":
     main()

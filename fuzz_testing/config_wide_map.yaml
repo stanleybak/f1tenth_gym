@@ -31,8 +31,8 @@ stheta3: 3.4
 
 
 # raceline path and indices
-wpt_path: './Spielberg_raceline.csv'
-wpt_path2: './Spielberg_centerline.csv'
+wpt_path: './wide_raceline.csv'
+wpt_path2: './wide_centerline.csv'
 wpt_delim: ';'
 wpt_rowskip: 3
 wpt_xind: 1
