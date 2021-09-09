@@ -458,6 +458,9 @@ class GraphBasedPlanner:
         # -- LOGGING ---------------------------------------------------------------------------------------------------
         self.ltpl_obj.log()
 
+        if len(self.traj_set) == 1 and "follow" in self.traj_set:
+            self.traj_set = {"straight": None}
+
         return self.traj_set, sel_action
 
     def control(self, pose_x, pose_y, pose_theta, current_velocity, traj_set, sel_action, controller):

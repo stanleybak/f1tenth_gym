@@ -8,7 +8,7 @@ import time
 import numpy as np
 import mockrospy as rospy
 
-from fuzz_test_gym import Driver, fuzz_test_gym
+from fuzz_test_gym import Driver, fuzz_test_gym, F110GymSim
 
 # sensor message types
 class LaserScan:
@@ -444,17 +444,28 @@ class DisparityExtenderDriver(Driver):
         vel = self.driving_params.velocity
         angle = self.driving_params.angle
 
-        if ego_index == 1: # slow opponent car
-            vel *= 1.0
+        #if ego_index == 1: # slow opponent car
+        #    self.counter += 1
+
+        #    if self.counter > 700:
+        #        print("slowing")
+        #        vel *= 0.75 #1.0
 
         return vel, angle
 
 def main():
     'main entry point'
 
+    load_progress_from_file = True
     nominal = False
     single_car = False
-    fuzz_test_gym(DisparityExtenderDriver, use_lidar=True, render_on=True, nominal=nominal, single_car=single_car)
+    use_rrt = True
+    max_nodes = 2048
+
+    #F110GymSim.obs_limits[1] = [-2, 2]
+
+    fuzz_test_gym(DisparityExtenderDriver, use_lidar=True, render_on=True, nominal=nominal, single_car=single_car,
+                  load_progress_from_file=load_progress_from_file, use_rrt=use_rrt, max_nodes=max_nodes)
 
 if __name__ == "__main__":
     main()

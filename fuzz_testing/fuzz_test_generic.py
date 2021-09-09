@@ -169,7 +169,7 @@ class Artists:
 
         if status == 'error':
             self.add_marker('red_x', node.obs, node.map_pos)
-        elif status == 'stop':
+        elif status in ['stop', 'out_of_bounds']:
             self.add_marker('black_x', node.obs, node.map_pos)
         else:
             #assert status == 'ok', f"status was {status}"
@@ -371,14 +371,17 @@ class TreeNode:
 
         assert self.state is not None
 
-    def expand_child(self, tree_search_obj, cmd):
+    def expand_child(self, tree_search_obj, cmd, allow_repeat_children=False):
         """expand the given child of this node"""
 
         artists = tree_search_obj.artists
         obs_limits_box = tree_search_obj.obs_limits_box
 
         assert TreeNode.sim_state_class is not None, "TreeNode.sim_state_class should be set first"
-        assert cmd not in self.children
+
+        if not allow_repeat_children:
+            assert cmd not in self.children
+            
         assert self.status == 'ok'
 
         obs_solid_paths = artists.obs_solid_lines.get_paths()
@@ -451,7 +454,7 @@ class TreeNode:
         min_node = None
         min_dist = np.inf
 
-        if self.status != "ok":
+        if self.status == "error":
             min_dist = np.linalg.norm(self.map_pos - map_pt)
             min_node = self
             
@@ -682,7 +685,7 @@ class TreeSearch:
 
     def find_crashes(self, root):
         crash_lst = []
-        if root.status != "ok":
+        if root.status == "error":
             crash_lst.append(root)
         for _,child_node in root.children.items():
             crash_lst+=self.find_crashes(child_node)
@@ -703,7 +706,10 @@ class TreeSearch:
 
         if frame > 0 and not self.paused:
             # sometimes save nodes
-            count = self.root.count_nodes()
+            count = TreeNode.node_counter
+
+            if not self.always_from_start:
+                assert count == self.root.count_nodes()
 
             if count >= 2 * self.last_save_count:
                 self.save_root()
@@ -778,7 +784,7 @@ class TreeSearch:
             f.write(raw)
 
         diff = time.perf_counter() - start
-        count = self.root.count_nodes()
+        count = TreeNode.node_counter #self.root.count_nodes()
         kb_per = 1024 * mb / count
         self.last_save_count = count
 
@@ -828,10 +834,15 @@ class TreeSearch:
             print(f"resetting to root due to cur_node.status: {status}")
             self.cur_node = self.root
 
+        use_saved_state_optimization = False
+            
         while True:
             cmd_list = TreeNode.sim_state_class.get_cmds()
             cmd = cmd_list[self.rng.integers(len(cmd_list))]
 
+            if not use_saved_state_optimization:
+                break # replay the state, possibly multiple times
+            
             if cmd in self.cur_node.children:
                 self.cur_node = self.cur_node.children[cmd]
             elif self.cur_node.status != 'ok':
@@ -840,7 +851,8 @@ class TreeSearch:
                 break
 
         # expand use_last_node using cmd
-        self.cur_node.expand_child(self, cmd)
+        allow_repeat_children = not use_saved_state_optimization
+        self.cur_node.expand_child(self, cmd, allow_repeat_children=allow_repeat_children)
         self.cur_node = self.cur_node.children[cmd]
 
         self.artists.update_rand_pt_marker(self.cur_node.obs, self.cur_node.obs)
@@ -914,7 +926,7 @@ def click_filter_func(tree_node: TreeNode) -> bool:
     
     rv = False
 
-    if tree_node.status != "ok" or not tree_node.children:
+    if tree_node.status == "error" or not tree_node.children:
         rv = True
 
     return rv
