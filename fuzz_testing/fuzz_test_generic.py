@@ -260,7 +260,17 @@ def is_out_of_bounds(pt, box):
             break
 
     return rv
-            
+
+def find_max_node(node):
+    'return index of max node'
+
+    i = node.node_index
+
+    for c in node.children.values():
+        i = max(find_max_node(c), i)
+
+    return i
+
 class TreeNode:
     'tree node in search'
 
@@ -381,7 +391,7 @@ class TreeNode:
 
         if not allow_repeat_children:
             assert cmd not in self.children
-            
+                            
         assert self.status == 'ok'
 
         obs_solid_paths = artists.obs_solid_lines.get_paths()
@@ -401,29 +411,37 @@ class TreeNode:
         child_state.step_sim(cmd)
 
         child_node = TreeNode(child_state, cmd_from_parent=cmd, parent=self, limits_box=obs_limits_box)
-        self.children[cmd] = child_node
 
-        # update marker
-        status = child_node.status
+        if cmd in self.children:
+            # cmd is already in children
+            old_child = self.children[cmd] 
+            old_child.node_index = child_node.node_index # update node index
 
-        if status == 'error':
-            artists.add_marker('red_x', child_node.obs, child_node.map_pos)
-        elif status in ['stop', 'out_of_bounds']:
-            artists.add_marker('black_x', child_node.obs, child_node.map_pos)
+            child_node = old_child
         else:
-            assert status == 'ok', f"status was {status}"
+            self.children[cmd] = child_node
 
-        # update drawing, add child to solid lines
-        cx, cy = child_node.obs[0:2]
-        cmapx, cmapy = child_node.map_pos
+            # update marker
+            status = child_node.status
 
-        codes = [Path.MOVETO, Path.LINETO]
-        verts = [(cx, cy), (sx, sy)]
-        obs_solid_paths.append(Path(verts, codes))
+            if status == 'error':
+                artists.add_marker('red_x', child_node.obs, child_node.map_pos)
+            elif status in ['stop', 'out_of_bounds']:
+                artists.add_marker('black_x', child_node.obs, child_node.map_pos)
+            else:
+                assert status == 'ok', f"status was {status}"
 
-        codes = [Path.MOVETO, Path.LINETO]
-        verts = [(cmapx, cmapy), (smapx, smapy)]
-        map_solid_paths.append(Path(verts, codes))
+            # update drawing, add child to solid lines
+            cx, cy = child_node.obs[0:2]
+            cmapx, cmapy = child_node.map_pos
+
+            codes = [Path.MOVETO, Path.LINETO]
+            verts = [(cx, cy), (sx, sy)]
+            obs_solid_paths.append(Path(verts, codes))
+
+            codes = [Path.MOVETO, Path.LINETO]
+            verts = [(cmapx, cmapy), (smapx, smapy)]
+            map_solid_paths.append(Path(verts, codes))
 
         if child_node.status == 'ok':
             tree_search_obj.add_to_cache(child_node)
@@ -715,6 +733,7 @@ class TreeSearch:
                 self.save_root()
 
             if count >= self.max_nodes:
+                self.save_root()
                 self.paused = True
                 print(f"Paused. Reached max_nodes: {self.max_nodes}")
             else:
@@ -873,6 +892,7 @@ class TreeSearch:
         # important for initializing renderer
         self.root = TreeNode(root_sim_state)
         count = 1
+        max_node = 0
 
         if load_progress_from_file:
             try:
@@ -880,15 +900,16 @@ class TreeSearch:
                     self.root = pickle.load(f)
                     assert self.root.state is not None
                     count = self.root.count_nodes()
+                    max_node = find_max_node(self.root)
             except FileNotFoundError:
                 pass
 
         if count == 1:
             print("initialized new search tree (1 node)")
         else:
-            print(f"initialized tree with {count} nodes")
+            print(f"initialized tree with {count} nodes, max_node={max_node}")
 
-        TreeNode.node_counter = count
+        TreeNode.node_counter = max_node + 1
         self.last_save_count = count
 
     def run(self, root_sim_state, load_progress_from_file):
