@@ -417,6 +417,7 @@ class TreeNode:
             old_child = self.children[cmd] 
             old_child.node_index = child_node.node_index # update node index
 
+            old_child.state = child_node.state
             child_node = old_child
         else:
             self.children[cmd] = child_node
@@ -443,7 +444,7 @@ class TreeNode:
             verts = [(cmapx, cmapy), (smapx, smapy)]
             map_solid_paths.append(Path(verts, codes))
 
-        if child_node.status == 'ok':
+        if child_node.status == 'ok':# and child_node.state is not None:
             tree_search_obj.add_to_cache(child_node)
         else:
             child_node.state = None

@@ -309,7 +309,7 @@ class SmoothBlockingDriver(Driver):
 def main():
     'main entry point'
 
-    use_rrt = True
+    use_rrt = False
     load_progress_from_file = True
     max_nodes = 2000
 
