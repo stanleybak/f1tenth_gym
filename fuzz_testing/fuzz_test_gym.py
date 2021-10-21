@@ -4,13 +4,12 @@ Interface for fuzz tester using gym environment
 
 from typing import Tuple
 import time
-import abc
 import sys
 
 from math import sqrt
 from argparse import Namespace
 from PIL import Image
-
+from driver import Driver
 
 import multiprocessing
 import numpy as np
@@ -21,13 +20,6 @@ from matplotlib.transforms import Bbox, TransformedBbox
 from f110_gym.envs import F110Env
 
 from fuzz_test_generic import SimulationState, run_fuzz_testing
-
-class Driver(abc.ABC):
-    """abstract class for planner"""
-
-    @abc.abstractmethod
-    def plan(self, obs, ego_index):
-        """returns speed, steer, obs_list is a list of observations for each car"""
 
 class F110GymSim(SimulationState):
     'simulation state for fuzzing'

@@ -146,12 +146,18 @@ def vehicle_dynamics_st(x, u_init, mu, C_Sf, C_Sr, lf, lr, h, m, I, s_min, s_max
     g = 9.81
 
     # constraints
-    u = np.array([steering_constraint(x[2], u_init[0], s_min, s_max, sv_min, sv_max), accl_constraints(x[3], u_init[1], v_switch, a_max, v_min, v_max)])
+    sv = steering_constraint(x[2], u_init[0], s_min, s_max, sv_min, sv_max)
+
+    #print(f"NJIT OFF; actual steering velocity: {sv}")
+    
+    u = np.array([sv, accl_constraints(x[3], u_init[1], v_switch, a_max, v_min, v_max)])
 
     # switch to kinematic model for small velocities
     if abs(x[3]) < 0.5:
         # wheelbase
         lwb = lf + lr
+
+        #print("using KS!")
 
         # system dynamics
         x_ks = x[0:5]
@@ -160,6 +166,8 @@ def vehicle_dynamics_st(x, u_init, mu, C_Sf, C_Sr, lf, lr, h, m, I, s_min, s_max
         0])))
 
     else:
+        #print("using SD!")
+                
         # system dynamics
         f = np.array([x[3]*np.cos(x[6] + x[4]),
             x[3]*np.sin(x[6] + x[4]),
@@ -190,11 +198,12 @@ def pid(speed, steer, current_speed, current_steer, max_sv, max_a, max_v, min_v)
     """
     # steering
     steer_diff = steer - current_steer
+    
     if np.fabs(steer_diff) > 1e-4:
         sv = (steer_diff / np.fabs(steer_diff)) * max_sv
     else:
         sv = 0.0
-
+        
     # accl
     vel_diff = speed - current_speed
     # currently forward

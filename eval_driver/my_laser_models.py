@@ -310,7 +310,7 @@ def ray_cast(pose, scan, scan_angles, vertices):
 
     return scan
 
-class ScanSimulator2D(object):
+class MyScanSimulator2D(object):
     """
     2D LIDAR scan simulator class
 
@@ -322,7 +322,7 @@ class ScanSimulator2D(object):
         max_range (float, default=30.0): maximum range of the laser
     """
 
-    def __init__(self, num_beams, fov, eps=0.0001, theta_dis=2000, max_range=30.0):
+    def __init__(self, map_path, map_yaml_path, num_beams=1080, fov=4.7, eps=0.0001, theta_dis=2000, max_range=30.0):
         # initialization 
         self.num_beams = num_beams
         self.fov = fov
@@ -339,15 +339,15 @@ class ScanSimulator2D(object):
         self.map_width = None
         self.map_resolution = None
         self.dt = None
-
-        #print("!! warning, using larger std_dev in scan() was 0.01 !!")
         
         # precomputing corresponding cosines and sines of the angle array
         theta_arr = np.linspace(0.0, 2*np.pi, num=theta_dis)
         self.sines = np.sin(theta_arr)
         self.cosines = np.cos(theta_arr)
-    
-    def set_map(self, map_path, map_ext):
+
+        self.set_map(map_path, map_yaml_path)
+        
+    def set_map(self, map_img_path, map_yaml_path):
         """
         Set the bitmap of the scan simulator by path
 
@@ -362,7 +362,7 @@ class ScanSimulator2D(object):
         # TODO: throw error if image specification isn't met
 
         # load map image
-        map_img_path = os.path.splitext(map_path)[0] + map_ext
+#        map_img_path = os.path.splitext(map_path)[0] + map_ext
         self.map_img = np.array(Image.open(map_img_path).transpose(Image.FLIP_TOP_BOTTOM))
         self.map_img = self.map_img.astype(np.float64)
 
@@ -374,7 +374,7 @@ class ScanSimulator2D(object):
         self.map_width = self.map_img.shape[1]
 
         # load map yaml
-        with open(map_path, 'r') as yaml_stream:
+        with open(map_yaml_path, 'r') as yaml_stream:
             try:
                 map_metadata = yaml.safe_load(yaml_stream)
                 self.map_resolution = map_metadata['resolution']
@@ -393,7 +393,7 @@ class ScanSimulator2D(object):
 
         return True
 
-    def scan(self, pose, rng, std_dev=0.01): #std_dev=0.01):
+    def scan(self, pose, rng=None, std_dev=0.01): #std_dev=0.01):
         """
         Perform simulated 2D scan by pose on the given map
 
@@ -424,193 +424,3 @@ class ScanSimulator2D(object):
         return self.angle_increment
 
 
-"""
-Unit tests for the 2D scan simulator class
-Author: Hongrui Zheng
-
-Test cases:
-    1, 2: Comparison between generated scan array of the new simulator and the legacy C++ simulator, generated data used, MSE is used as the metric
-    2. FPS test, should be greater than 500
-"""
-
-
-class ScanTests(unittest.TestCase):
-    def setUp(self):
-        # test params
-        self.num_beams = 1080
-        self.fov = 4.7
-
-        self.num_test = 10
-        self.test_poses = np.zeros((self.num_test, 3))
-        self.test_poses[:, 2] = np.linspace(-1., 1., num=self.num_test)
-
-        # # legacy gym data
-        # sample_scan = np.load('legacy_scan.npz')
-        # self.berlin_scan = sample_scan['berlin']
-        # self.skirk_scan = sample_scan['skirk']
-
-    # def test_map_berlin(self):
-    #     scan_rng = np.random.default_rng(seed=12345)
-    #     scan_sim = ScanSimulator2D(self.num_beams, self.fov)
-    #     new_berlin = np.empty((self.num_test, self.num_beams))
-    #     map_path = '../../../maps/berlin.yaml'
-    #     map_ext = '.png'
-    #     scan_sim.set_map(map_path, map_ext)
-    #     # scan gen loop
-    #     for i in range(self.num_test):
-    #         test_pose = self.test_poses[i]
-    #         new_berlin[i,:] = scan_sim.scan(test_pose, scan_rng)
-    #     diff = self.berlin_scan - new_berlin
-    #     mse = np.mean(diff**2)
-    #     # print('Levine distance test, norm: ' + str(norm))
-
-    #     # plotting
-    #     import matplotlib.pyplot as plt
-    #     theta = np.linspace(-self.fov/2., self.fov/2., num=self.num_beams)
-    #     plt.polar(theta, new_berlin[1,:], '.', lw=0)
-    #     plt.polar(theta, self.berlin_scan[1,:], '.', lw=0)
-    #     plt.show()
-
-    #     self.assertLess(mse, 2.)
-
-    # def test_map_skirk(self):
-    #     scan_rng = np.random.default_rng(seed=12345)
-    #     scan_sim = ScanSimulator2D(self.num_beams, self.fov)
-    #     new_skirk = np.empty((self.num_test, self.num_beams))
-    #     map_path = '../../../maps/skirk.yaml'
-    #     map_ext = '.png'
-    #     scan_sim.set_map(map_path, map_ext)
-    #     print('map set')
-    #     # scan gen loop
-    #     for i in range(self.num_test):
-    #         test_pose = self.test_poses[i]
-    #         new_skirk[i,:] = scan_sim.scan(test_pose, scan_rng)
-    #     diff = self.skirk_scan - new_skirk
-    #     mse = np.mean(diff**2)
-    #     print('skirk distance test, mse: ' + str(mse))
-
-    #     # plotting
-    #     import matplotlib.pyplot as plt
-    #     theta = np.linspace(-self.fov/2., self.fov/2., num=self.num_beams)
-    #     plt.polar(theta, new_skirk[1,:], '.', lw=0)
-    #     plt.polar(theta, self.skirk_scan[1,:], '.', lw=0)
-    #     plt.show()
-
-    #     self.assertLess(mse, 2.)
-
-    def test_fps(self):
-        # scan fps should be greater than 500
-
-        scan_rng = np.random.default_rng(seed=12345)
-        scan_sim = ScanSimulator2D(self.num_beams, self.fov)
-        map_path = '../envs/maps/berlin.yaml'
-        map_ext = '.png'
-        scan_sim.set_map(map_path, map_ext)
-        
-        import time
-        start = time.time()
-        for i in range(10000):
-            x_test = i/10000
-            scan = scan_sim.scan(np.array([x_test, 0., 0.]), scan_rng)
-        end = time.time()
-        fps = 10000/(end-start)
-        # print('FPS test')
-        # print('Elapsed time: ' + str(end-start) + ' , FPS: ' + str(1/fps))
-        self.assertGreater(fps, 500.)
-
-    def test_rng(self):
-        num_beams = 1080
-        fov = 4.7
-        map_path = '../envs/maps/berlin.yaml'
-        map_ext = '.png'
-        it = 100
-
-        scan_rng = np.random.default_rng(seed=12345)
-        scan_sim = ScanSimulator2D(num_beams, fov)
-        scan_sim.set_map(map_path, map_ext)
-        scan1 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        scan2 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        for i in range(it):
-            scan3 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        scan4 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        
-        scan_rng = np.random.default_rng(seed=12345)
-        scan5 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        scan2 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        for i in range(it):
-            _ = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        scan6 = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-        
-        self.assertTrue(np.allclose(scan1, scan5))
-        self.assertFalse(np.allclose(scan1, scan2))
-        self.assertFalse(np.allclose(scan1, scan3))
-        self.assertTrue(np.allclose(scan4, scan6))
-
-
-def main():
-    num_beams = 1080
-    fov = 4.7
-    # map_path = '../envs/maps/berlin.yaml'
-    map_path = '../../../examples/example_map.yaml'
-    map_ext = '.png'
-    scan_rng = np.random.default_rng(seed=12345)
-    scan_sim = ScanSimulator2D(num_beams, fov)
-    scan_sim.set_map(map_path, map_ext)
-    scan = scan_sim.scan(np.array([0., 0., 0.]), scan_rng)
-
-    # fps test
-    import time
-    start = time.time()
-    for i in range(10000):
-        x_test = i/10000
-        scan = scan_sim.scan(np.array([x_test, 0., 0.]), scan_rng)
-    end = time.time()
-    fps = (end-start)/10000
-    print('FPS test')
-    print('Elapsed time: ' + str(end-start) + ' , FPS: ' + str(1/fps))
-
-    # visualization
-    import matplotlib.pyplot as plt
-    from matplotlib.animation import FuncAnimation
-    num_iter = 100
-    theta = np.linspace(-fov/2., fov/2., num=num_beams)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='polar')
-    ax.set_ylim(0, 31)
-    line, = ax.plot([], [], '.', lw=0)
-    def update(i):
-        # x_ani = i * 3. / num_iter
-        theta_ani = -i * 2 * np.pi / num_iter
-        x_ani = 0.
-        current_scan = scan_sim.scan(np.array([x_ani, 0., theta_ani]), scan_rng)
-        print(np.max(current_scan))
-        line.set_data(theta, current_scan)
-        return line, 
-    ani = FuncAnimation(fig, update, frames=num_iter, blit=True)
-    plt.show()
-
-if __name__ == '__main__':
-    unittest.main()
-    #main()
-
-    # import time 
-    # pt_a = np.array([1., 1.])
-    # pt_b = np.array([1., 2.])
-    # pt_c = np.array([1., 3.])
-    # col = are_collinear(pt_a, pt_b, pt_c)
-    # print(col)
-
-    # pose = np.array([0., 0., -1.])
-    # beam_theta = 0.
-    # start = time.time()
-    # dist = get_range(pose, beam_theta, pt_a, pt_b)
-    # print(dist, time.time()-start)
-
-    # num_beams = 1080
-    # scan = 100.*np.ones((num_beams, ))
-    # scan_angles = np.linspace(-2.35, 2.35, num=num_beams)
-    # assert scan.shape[0] == scan_angles.shape[0]
-    # vertices = np.asarray([[4,11.],[5,5],[9,9],[10,10]])
-    # start = time.time()
-    # new_scan = ray_cast(pose, scan, scan_angles, vertices)
-    # print(time.time()-start)

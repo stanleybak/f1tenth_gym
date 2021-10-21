@@ -82,6 +82,9 @@ class RaceCar(object):
         self.num_beams = num_beams
         self.fov = fov
 
+        # stan vars
+        self.steer_diff = 0
+
         # state is [x, y, steer_angle, vel, yaw_angle, yaw_rate, slip_angle]
         self.state = np.zeros((7, ))
 
@@ -105,6 +108,7 @@ class RaceCar(object):
         # initialize scan sim
         if RaceCar.scan_simulator is None:
             self.scan_rng = np.random.default_rng(seed=self.seed)
+
             RaceCar.scan_simulator = ScanSimulator2D(num_beams, fov)
 
             scan_ang_incr = RaceCar.scan_simulator.get_increment()
@@ -189,6 +193,7 @@ class RaceCar(object):
         self.state[4] = pose[2]
         self.steer_buffer = np.empty((0, ))
         # reset scan random generator
+        #print(f"!! base_classes, reset with seed {self.seed}")
         self.scan_rng = np.random.default_rng(seed=self.seed)
 
     def ray_cast_agents(self, scan):
@@ -265,9 +270,14 @@ class RaceCar(object):
             self.steer_buffer = self.steer_buffer[:-1]
             self.steer_buffer = np.append(raw_steer, self.steer_buffer)
 
+        #print(f"note: using raw steer: {round(raw_steer,4)}, current steer: {self.state[2]}")
+        #steer = raw_steer
 
         # steering angle velocity input to steering velocity acceleration input
         accl, sv = pid(vel, steer, self.state[3], self.state[2], self.params['sv_max'], self.params['a_max'], self.params['v_max'], self.params['v_min'])
+
+        #print(f"steer: {steer}, sv: {sv}")
+        self.steer_diff = steer - self.state[2]
         
         # update physics, get RHS of diff'eq
         f = vehicle_dynamics_st(

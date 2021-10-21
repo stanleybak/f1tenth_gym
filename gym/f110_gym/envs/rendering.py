@@ -323,7 +323,10 @@ class EnvRenderer(pyglet.window.Window):
                 else:
                     vertices_np = get_vertices(np.array([0., 0., 0.]), CAR_LENGTH, CAR_WIDTH)
                     vertices = list(vertices_np.flatten())
-                    car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', [99, 52, 94, 99, 52, 94, 99, 52, 94, 99, 52, 94]))
+
+                    #rgb = [99, 52, 94]
+                    rgb = [255, 0, 0]
+                    car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', rgb * 4))
                     self.cars.append(car)
 
         poses = np.stack((poses_x, poses_y, poses_theta)).T
