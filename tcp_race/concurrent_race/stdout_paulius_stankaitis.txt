@@ -1,0 +1,45 @@
+Running in Docker using container name paulius_stankaitis_id13_container and image name paulius_stankaitis_image.
+Sending build context to Docker daemon  31.02MB
+Step 1/13 : FROM ros:noetic-robot-focal
+ ---> 8b211266230d
+Step 2/13 : RUN echo "Starting..."
+ ---> Using cache
+ ---> 92a92b543a1f
+Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
+ ---> Using cache
+ ---> d9bd8558eb9f
+Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
+ ---> Using cache
+ ---> e49fc54eecb4
+Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
+ ---> Using cache
+ ---> 377bdb289268
+Step 6/13 : WORKDIR /race
+ ---> Using cache
+ ---> 01121af23e54
+Step 7/13 : ADD "./${TARFILE}" /race/files
+ ---> Using cache
+ ---> 17c5ab887a1d
+Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
+ ---> Using cache
+ ---> a899bca745d1
+Step 9/13 : COPY ./networking.py .
+ ---> Using cache
+ ---> bbfc96d0a353
+Step 10/13 : COPY ./riders_client_tcp_race.py .
+ ---> Using cache
+ ---> e1b299552e73
+Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
+ ---> Using cache
+ ---> eedd808cbd57
+Step 12/13 : WORKDIR /race/files/pkg
+ ---> Using cache
+ ---> bff75d14aec1
+Step 13/13 : RUN pip3 install -r requirements.txt
+ ---> Using cache
+ ---> 009ad601165c
+Successfully built 009ad601165c
+Successfully tagged paulius_stankaitis_image:latest
+running Driver import line: from pkg.drivers import VaNNewDrive as Driver
+Connecting to port 54959...
+got 'exit' or None: None

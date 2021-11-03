@@ -1,0 +1,45 @@
+Running in Docker using container name gerhard_didier_id12_container and image name gerhard_didier_image.
+Sending build context to Docker daemon  31.02MB
+Step 1/13 : FROM ros:noetic-robot-focal
+ ---> 8b211266230d
+Step 2/13 : RUN echo "Starting..."
+ ---> Using cache
+ ---> 92a92b543a1f
+Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
+ ---> Using cache
+ ---> d9bd8558eb9f
+Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
+ ---> Using cache
+ ---> e49fc54eecb4
+Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
+ ---> Using cache
+ ---> 7b4c3612305b
+Step 6/13 : WORKDIR /race
+ ---> Using cache
+ ---> c9140ece6b06
+Step 7/13 : ADD "./${TARFILE}" /race/files
+ ---> Using cache
+ ---> 0a29e19cf2a0
+Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
+ ---> Using cache
+ ---> 4ca8d3202f1f
+Step 9/13 : COPY ./networking.py .
+ ---> Using cache
+ ---> cc3cce9508c7
+Step 10/13 : COPY ./riders_client_tcp_race.py .
+ ---> Using cache
+ ---> 4a579e50cadd
+Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
+ ---> Using cache
+ ---> 8e3b437f1353
+Step 12/13 : WORKDIR /race/files/pkg
+ ---> Using cache
+ ---> becf7036f334
+Step 13/13 : RUN pip3 install -r requirements.txt
+ ---> Using cache
+ ---> df69508a77d7
+Successfully built df69508a77d7
+Successfully tagged gerhard_didier_image:latest
+running Driver import line: from pkg.drivers import DisparityExtenderSpeedControl as Driver
+Connecting to port 54959...
+got 'exit' or None: None

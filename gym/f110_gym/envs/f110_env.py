@@ -149,6 +149,11 @@ class F110Env(gym.Env):
         except:
             self.ego_idx = 0
 
+        try:
+            should_check_collisions = kwargs['should_check_collisions']
+        except:
+            should_check_collisions = True
+
         # radius to consider done
         self.start_thresh = 0.5  # 10cm
 
@@ -180,7 +185,7 @@ class F110Env(gym.Env):
         self.start_rot = np.eye(2)
 
         # initiate stuff
-        self.sim = Simulator(self.params, self.num_agents, self.seed, num_beams=self.num_beams)
+        self.sim = Simulator(self.params, self.num_agents, self.seed, num_beams=self.num_beams, should_check_collisions=should_check_collisions)
         self.sim.set_map(self.map_path, self.map_ext)
 
         # stateful observations for rendering

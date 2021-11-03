@@ -92,6 +92,24 @@ class EnvRenderer(pyglet.window.Window):
         # current env agent vertices, (num_agents, 4, 2), 2nd and 3rd dimensions are the 4 corners in 2D
         self.vertices = None
 
+        # rgb values for cars
+        self.rgbs = [[0, 255, 0],
+         [255, 0, 0],
+         [0, 255, 255],
+         [255, 255, 0],
+         [255, 192, 203],
+         [255, 0, 255],
+         [0, 128, 0],
+         [135, 206, 235],
+         [255, 165, 0],
+         [173, 255, 47],
+         [255, 218, 185],
+         [255, 165, 0],
+         [0, 255, 255],
+         [255, 255, 0],
+         [255, 0, 255],
+         [135, 206, 235]]
+
         # current score label
         self.score_label = pyglet.text.Label(
                 'Lap Time: {laptime:.2f}, Ego Lap Count: {count:.0f}'.format(
@@ -312,22 +330,33 @@ class EnvRenderer(pyglet.window.Window):
         poses_theta = obs['poses_theta']
 
         num_agents = len(poses_x)
+
+        #############
         if self.poses is None:
             self.cars = []
+            
             for i in range(num_agents):
-                if i == self.ego_idx:
-                    vertices_np = get_vertices(np.array([0., 0., 0.]), CAR_LENGTH, CAR_WIDTH)
-                    vertices = list(vertices_np.flatten())
-                    car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', [172, 97, 185, 172, 97, 185, 172, 97, 185, 172, 97, 185]))
-                    self.cars.append(car)
-                else:
-                    vertices_np = get_vertices(np.array([0., 0., 0.]), CAR_LENGTH, CAR_WIDTH)
-                    vertices = list(vertices_np.flatten())
+                rgb = self.rgbs[i % len(self.rgbs)]
+
+                vertices_np = get_vertices(np.array([0., 0., 0.]), CAR_LENGTH, CAR_WIDTH)
+                vertices = list(vertices_np.flatten())
+
+                car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', rgb * 4))
+                self.cars.append(car)
+                
+                #if i == self.ego_idx:
+                #    vertices_np = get_vertices(np.array([0., 0., 0.]), CAR_LENGTH, CAR_WIDTH)
+                #    vertices = list(vertices_np.flatten())
+                #    car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', [172, 97, 185, 172, 97, 185, 172, 97, 185, 172, 97, 185]))
+                #    self.cars.append(car)
+                #else:
+                #    vertices_np = get_vertices(np.array([0., 0., 0.]), CAR_LENGTH, CAR_WIDTH)
+                #    vertices = list(vertices_np.flatten())
 
                     #rgb = [99, 52, 94]
-                    rgb = [255, 0, 0]
-                    car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', rgb * 4))
-                    self.cars.append(car)
+                #    rgb = [255, 0, 0]
+                #    car = self.batch.add(4, GL_QUADS, None, ('v2f', vertices), ('c3B', rgb * 4))
+                #    self.cars.append(car)
 
         poses = np.stack((poses_x, poses_y, poses_theta)).T
         for j in range(poses.shape[0]):

@@ -47,7 +47,7 @@ class MyRenderer(pyglet.window.Window):
 
         self.closed = False
 
-    def on_draw(self):
+    def on_draw(self, extra_draw_func=None):
         """
         Function when the pyglet is drawing. The function draws the batch created that includes the map points, the agent polygons, and the information text, and the fps display.
         
@@ -77,6 +77,10 @@ class MyRenderer(pyglet.window.Window):
         # Draw all batches
         self.batch.draw()
         self.fps_display.draw()
+
+        if extra_draw_func is not None:
+            extra_draw_func()
+        
         # Remove default modelview matrix
         gl.glPopMatrix()
 
@@ -113,7 +117,17 @@ def main():
             ('c3B/static', green + red + green + red)
         )
 
+    #label = pyglet.text.Label('Hello World!', font_name='Arial',font_size=36, x=0, y=0)
+    
     counter = 0
+
+    #label_list = [None]
+
+    #def extra_draw_func():
+    #    if label_list[0]:
+    #        label_list[0].draw()
+
+    old_label = None
 
     # render loop
     while not w.closed:
@@ -129,9 +143,22 @@ def main():
 
         vertex_list.vertices[3:5] = 2*x, y
 
-        print(x, y)
+        if old_label is not None:
+            old_label.delete()
+        
+        old_label = pyglet.text.Label('Hello World',
+        font_size=20,
+        x=2*x,
+        y=y,
+        anchor_x='center',
+        anchor_y='center',
+        color=(255, 255, 255, 255), batch=w.batch)
 
-        time.sleep(0.01)
+        #label_list[0] = label
+
+        #print(x, y)
+
+        #time.sleep(0.01)
 
 if __name__ == "__main__":
     main()

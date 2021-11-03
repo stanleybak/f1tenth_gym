@@ -364,7 +364,7 @@ class Simulator(object):
 
     """
 
-    def __init__(self, params, num_agents, seed, time_step=0.01, ego_idx=0, num_beams=1080):
+    def __init__(self, params, num_agents, seed, time_step=0.01, ego_idx=0, num_beams=1080, should_check_collisions=True):
         """
         Init function
 
@@ -387,6 +387,8 @@ class Simulator(object):
         self.agents = []
         self.collisions = np.zeros((self.num_agents, ))
         self.collision_idx = -1 * np.ones((self.num_agents, ))
+
+        self.should_check_collisions = should_check_collisions
 
         # initializing agents
         for i in range(self.num_agents):
@@ -475,7 +477,8 @@ class Simulator(object):
             self.agent_poses[i, :] = np.append(agent.state[0:2], agent.state[4])
 
         # check collisions between all agents
-        self.check_collision()
+        if self.should_check_collisions:
+            self.check_collision()
 
         for i, agent in enumerate(self.agents):
             # update agent's information on other agents

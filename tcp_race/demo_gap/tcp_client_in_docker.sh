@@ -8,7 +8,7 @@ if [ "$#" -eq 3 ]; then
     DRIVER_ID=$2
     GAIN=$3
 else
-    echo "run_in_docker.sh expected 3 arguments: <server_port> <driver_id> <gain>"
+    echo "expected 3 arguments: <server_port> <driver_id> <gain>"
     exit 1
 	
 fi

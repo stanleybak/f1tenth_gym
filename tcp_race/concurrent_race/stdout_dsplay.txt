@@ -1,0 +1,45 @@
+Running in Docker using container name dsplay_id7_container and image name dsplay_image.
+Sending build context to Docker daemon  31.02MB
+Step 1/13 : FROM ros:noetic-robot-focal
+ ---> 8b211266230d
+Step 2/13 : RUN echo "Starting..."
+ ---> Using cache
+ ---> 92a92b543a1f
+Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
+ ---> Using cache
+ ---> d9bd8558eb9f
+Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
+ ---> Using cache
+ ---> e49fc54eecb4
+Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
+ ---> Using cache
+ ---> a68c92e910c5
+Step 6/13 : WORKDIR /race
+ ---> Using cache
+ ---> a625e4163a53
+Step 7/13 : ADD "./${TARFILE}" /race/files
+ ---> Using cache
+ ---> f73586932a26
+Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
+ ---> Using cache
+ ---> f015e48dadd1
+Step 9/13 : COPY ./networking.py .
+ ---> Using cache
+ ---> 2013068a3aba
+Step 10/13 : COPY ./riders_client_tcp_race.py .
+ ---> Using cache
+ ---> 6287bbdbd70b
+Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
+ ---> Using cache
+ ---> 1cc87fdde2a9
+Step 12/13 : WORKDIR /race/files/pkg
+ ---> Using cache
+ ---> a99f8bb89376
+Step 13/13 : RUN pip3 install -r requirements.txt
+ ---> Using cache
+ ---> 6bf9a894543d
+Successfully built 6bf9a894543d
+Successfully tagged dsplay_image:latest
+running Driver import line: from pkg.drivers import MyDriver as Driver
+Connecting to port 54959...
+got 'exit' or None: None

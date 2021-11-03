@@ -85,6 +85,7 @@ def start_server():
     assert sockets[0] is not None and sockets[1] is not None
 
     crashed = [False] * num_agents
+    frames = 0
     
     while True:
         actions = np.zeros((2, 2))
@@ -120,13 +121,14 @@ def start_server():
             actions[i, 1] = obj['speed']
 
         obs, step_reward, done, info = env.step(actions)
+        frames += 1
         env.render(mode='human_fast')
 
         toggle_list = info['checkpoint_done']
 
         if True in toggle_list:
-            winner = toggle_list.index(True)
-            print(f"Race completed. Winner: {winner}")
+            winner = list(toggle_list).index(True)
+            print(f"Race completed in {round(frames / 100, 2)} sec. Winner: {winner}")
             break
 
         if all(crashed):
