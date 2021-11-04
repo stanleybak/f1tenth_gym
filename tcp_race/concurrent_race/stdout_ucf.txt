@@ -1,60 +1,49 @@
 Running in Docker using container name ucf_id9_container and image name ucf_image.
-Sending build context to Docker daemon  31.02MB
+Sending build context to Docker daemon  35.71MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
  ---> Using cache
- ---> 92a92b543a1f
+ ---> 132d939a8cce
 Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
  ---> Using cache
- ---> d9bd8558eb9f
+ ---> 192880db760e
 Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
  ---> Using cache
- ---> e49fc54eecb4
+ ---> a9bce34ba3cc
 Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
  ---> Using cache
- ---> b68539fc4626
+ ---> c096d167a888
 Step 6/13 : WORKDIR /race
  ---> Using cache
- ---> 1ad4c39fff80
+ ---> e5ee9a3a0a4b
 Step 7/13 : ADD "./${TARFILE}" /race/files
  ---> Using cache
- ---> f1879705e047
+ ---> 4e2c05663eca
 Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
  ---> Using cache
- ---> c306dda89db9
+ ---> 1ae6574e72c6
 Step 9/13 : COPY ./networking.py .
  ---> Using cache
- ---> 5be703d8e413
+ ---> 54f0b8cb578d
 Step 10/13 : COPY ./riders_client_tcp_race.py .
  ---> Using cache
- ---> fa0d65208113
+ ---> 42da33b59853
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
  ---> Using cache
- ---> efa9810387dc
+ ---> 20ac42b09a04
 Step 12/13 : WORKDIR /race/files/pkg
  ---> Using cache
- ---> 6827e3060288
+ ---> a9ed9f45e155
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Running in d66877a869c4
-Collecting Pillow==8.3.2
-  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
-Collecting numba
-  Downloading numba-0.54.1-cp38-cp38-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.3 MB)
-Requirement already satisfied: setuptools in /usr/lib/python3/dist-packages (from numba->-r requirements.txt (line 3)) (45.2.0)
-Requirement already satisfied: numpy<1.21,>=1.17 in /usr/lib/python3/dist-packages (from numba->-r requirements.txt (line 3)) (1.17.4)
-Collecting llvmlite<0.38,>=0.37.0rc1
-  Downloading llvmlite-0.37.0-cp38-cp38-manylinux2014_x86_64.whl (26.3 MB)
-Installing collected packages: Pillow, llvmlite, numba
-Successfully installed Pillow-8.3.2 llvmlite-0.37.0 numba-0.54.1
-Removing intermediate container d66877a869c4
- ---> e83871129d6d
-Successfully built e83871129d6d
+ ---> Using cache
+ ---> 688837f95155
+Successfully built 688837f95155
 Successfully tagged ucf_image:latest
 running Driver import line: from pkg.disparity_extender_combined import DisparityExtenderDriving as Driver
 wall manager init
-Connecting to port 54959...
-no obs track
-got 'exit' or None: None
+Connecting to port 52257...
+OBSTACLE
+got 'exit' or None: {'type': 'exit'}
 /race/files/pkg/src/pkg/opp_car_detector.py:101: YAMLLoadWarning: calling yaml.load() without Loader=... is deprecated, as the default Loader is unsafe. Please read https://msg.pyyaml.org/load for full details.
   input_file = yaml.load(stream)

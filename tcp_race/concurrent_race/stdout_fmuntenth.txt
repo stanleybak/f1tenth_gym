@@ -1,45 +1,45 @@
 Running in Docker using container name fmuntenth_id3_container and image name fmuntenth_image.
-Sending build context to Docker daemon  31.01MB
+Sending build context to Docker daemon  35.71MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
  ---> Using cache
- ---> 92a92b543a1f
+ ---> 132d939a8cce
 Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
  ---> Using cache
- ---> d9bd8558eb9f
+ ---> 192880db760e
 Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
  ---> Using cache
- ---> e49fc54eecb4
+ ---> a9bce34ba3cc
 Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
  ---> Using cache
- ---> 3581a576f27f
+ ---> c381dc78a4de
 Step 6/13 : WORKDIR /race
  ---> Using cache
- ---> 5c6dc2a3119a
+ ---> 49216da94b05
 Step 7/13 : ADD "./${TARFILE}" /race/files
  ---> Using cache
- ---> 48a5ae4b4db9
+ ---> d8836d856d64
 Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
  ---> Using cache
- ---> 574cf7b9bd22
+ ---> 1f866207c55e
 Step 9/13 : COPY ./networking.py .
  ---> Using cache
- ---> 0c97aac30314
+ ---> 57e55809365c
 Step 10/13 : COPY ./riders_client_tcp_race.py .
  ---> Using cache
- ---> 606571b69158
+ ---> 4fe5323430e4
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
  ---> Using cache
- ---> 2b28575d7ead
+ ---> 9bb12f6cfcb2
 Step 12/13 : WORKDIR /race/files/pkg
  ---> Using cache
- ---> a21ba8d095c3
+ ---> 206e5133f32c
 Step 13/13 : RUN pip3 install -r requirements.txt
  ---> Using cache
- ---> 329d0327104f
-Successfully built 329d0327104f
+ ---> ebdf72e8fa9d
+Successfully built ebdf72e8fa9d
 Successfully tagged fmuntenth_image:latest
 running Driver import line: from pkg.drivers import GapFollower as Driver
-Connecting to port 54959...
-got 'exit' or None: None
+Connecting to port 52257...
+got 'exit' or None: {'type': 'exit'}

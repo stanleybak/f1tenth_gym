@@ -1,45 +1,45 @@
 Running in Docker using container name audubon_racing_id10_container and image name audubon_racing_image.
-Sending build context to Docker daemon  31.02MB
+Sending build context to Docker daemon  35.71MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
  ---> Using cache
- ---> 92a92b543a1f
+ ---> 132d939a8cce
 Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
  ---> Using cache
- ---> d9bd8558eb9f
+ ---> 192880db760e
 Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
  ---> Using cache
- ---> e49fc54eecb4
+ ---> a9bce34ba3cc
 Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
  ---> Using cache
- ---> f69b9104b9cd
+ ---> b77eab717fea
 Step 6/13 : WORKDIR /race
  ---> Using cache
- ---> 6145fc963b48
+ ---> 42891b5f0c43
 Step 7/13 : ADD "./${TARFILE}" /race/files
  ---> Using cache
- ---> 5c5c0bf7a654
+ ---> 13fa9bc2bdea
 Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
  ---> Using cache
- ---> c6587df20317
+ ---> 92c560393f25
 Step 9/13 : COPY ./networking.py .
  ---> Using cache
- ---> 05c86008f28f
+ ---> 992a3b93e568
 Step 10/13 : COPY ./riders_client_tcp_race.py .
  ---> Using cache
- ---> beb296f9c717
+ ---> b8181d0633df
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
  ---> Using cache
- ---> 9b4e8ba18245
+ ---> 2b42f1ca61da
 Step 12/13 : WORKDIR /race/files/pkg
  ---> Using cache
- ---> 96722c2663db
+ ---> 04c5e538b504
 Step 13/13 : RUN pip3 install -r requirements.txt
  ---> Using cache
- ---> 2d94870156f1
-Successfully built 2d94870156f1
+ ---> 8f1f2daef0fc
+Successfully built 8f1f2daef0fc
 Successfully tagged audubon_racing_image:latest
 running Driver import line: from pkg.vfh_gym import VFH as Driver
-Connecting to port 54959...
-got 'exit' or None: None
+Connecting to port 52257...
+got 'exit' or None: {'type': 'exit'}

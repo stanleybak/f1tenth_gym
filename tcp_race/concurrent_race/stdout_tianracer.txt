@@ -1,45 +1,45 @@
 Running in Docker using container name tianracer_id15_container and image name tianracer_image.
-Sending build context to Docker daemon  31.02MB
+Sending build context to Docker daemon  35.71MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
  ---> Using cache
- ---> 92a92b543a1f
+ ---> 132d939a8cce
 Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
  ---> Using cache
- ---> d9bd8558eb9f
+ ---> 192880db760e
 Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
  ---> Using cache
- ---> e49fc54eecb4
+ ---> a9bce34ba3cc
 Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
  ---> Using cache
- ---> 7ae379677783
+ ---> 7ab828b1fdb8
 Step 6/13 : WORKDIR /race
  ---> Using cache
- ---> 41fc9b3ad19d
+ ---> b26a803fba84
 Step 7/13 : ADD "./${TARFILE}" /race/files
  ---> Using cache
- ---> fde3bba867c6
+ ---> c213a83ed446
 Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
  ---> Using cache
- ---> eb7bc6cd0c06
+ ---> 06b017740d3c
 Step 9/13 : COPY ./networking.py .
  ---> Using cache
- ---> bf29d77fd864
+ ---> 1b94f9e1acbf
 Step 10/13 : COPY ./riders_client_tcp_race.py .
  ---> Using cache
- ---> 0bac0833f2d0
+ ---> f63371d67be0
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
  ---> Using cache
- ---> 547bdb3ee24a
+ ---> 062797fafd18
 Step 12/13 : WORKDIR /race/files/pkg
  ---> Using cache
- ---> 2fe1c09d281d
+ ---> f49fdf646a3f
 Step 13/13 : RUN pip3 install -r requirements.txt
  ---> Using cache
- ---> 90fb43ae72da
-Successfully built 90fb43ae72da
+ ---> 3c831d5c0f19
+Successfully built 3c831d5c0f19
 Successfully tagged tianracer_image:latest
 running Driver import line: from pkg.drivers import GapFollower as Driver
-Connecting to port 54959...
-got 'exit' or None: None
+Connecting to port 52257...
+got 'exit' or None: {'type': 'exit'}

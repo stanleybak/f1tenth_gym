@@ -1,45 +1,45 @@
 Running in Docker using container name rail_id5_container and image name rail_image.
-Sending build context to Docker daemon  31.01MB
+Sending build context to Docker daemon  35.71MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
  ---> Using cache
- ---> 92a92b543a1f
+ ---> 132d939a8cce
 Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
  ---> Using cache
- ---> d9bd8558eb9f
+ ---> 192880db760e
 Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
  ---> Using cache
- ---> e49fc54eecb4
+ ---> a9bce34ba3cc
 Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
  ---> Using cache
- ---> d2c88e86f078
+ ---> 1b75f1f58253
 Step 6/13 : WORKDIR /race
  ---> Using cache
- ---> c983c771ecfe
+ ---> c04ec9c9420b
 Step 7/13 : ADD "./${TARFILE}" /race/files
  ---> Using cache
- ---> a85fdcd8c96a
+ ---> c75e85cb0763
 Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
  ---> Using cache
- ---> d351be42f32c
+ ---> 7d480d5e9d94
 Step 9/13 : COPY ./networking.py .
  ---> Using cache
- ---> fcf7b7abfe3e
+ ---> a284686ccbab
 Step 10/13 : COPY ./riders_client_tcp_race.py .
  ---> Using cache
- ---> 092690a6cba2
+ ---> ec078b8494d8
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
  ---> Using cache
- ---> d3d4db1e7c18
+ ---> d0ab9ed245db
 Step 12/13 : WORKDIR /race/files/pkg
  ---> Using cache
- ---> fa162f137c83
+ ---> 51132db973a3
 Step 13/13 : RUN pip3 install -r requirements.txt
  ---> Using cache
- ---> f8d6ea6f19b3
-Successfully built f8d6ea6f19b3
+ ---> aeeb6574ad78
+Successfully built aeeb6574ad78
 Successfully tagged rail_image:latest
 running Driver import line: from pkg.drivers import RAIL_AV as Driver
-Connecting to port 54959...
-got 'exit' or None: None
+Connecting to port 52257...
+got 'exit' or None: {'type': 'exit'}

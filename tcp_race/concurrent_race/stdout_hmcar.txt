@@ -1,47 +1,47 @@
 Running in Docker using container name hmcar_id4_container and image name hmcar_image.
-Sending build context to Docker daemon  31.01MB
+Sending build context to Docker daemon  35.71MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
  ---> Using cache
- ---> 92a92b543a1f
+ ---> 132d939a8cce
 Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
  ---> Using cache
- ---> d9bd8558eb9f
+ ---> 192880db760e
 Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
  ---> Using cache
- ---> e49fc54eecb4
+ ---> a9bce34ba3cc
 Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
  ---> Using cache
- ---> 897033e3762d
+ ---> c69da877f288
 Step 6/13 : WORKDIR /race
  ---> Using cache
- ---> 5b12c5933a11
+ ---> edf478c5807e
 Step 7/13 : ADD "./${TARFILE}" /race/files
  ---> Using cache
- ---> ec36ad0917c1
+ ---> f561ab9a017a
 Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
  ---> Using cache
- ---> d56f062af492
+ ---> 00141e3c98d3
 Step 9/13 : COPY ./networking.py .
  ---> Using cache
- ---> 97670cc4f901
+ ---> dcc3d8cb4e53
 Step 10/13 : COPY ./riders_client_tcp_race.py .
  ---> Using cache
- ---> 164698a41e5b
+ ---> e19649bd31d5
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
  ---> Using cache
- ---> 5c0ef1809226
+ ---> 4c66c5299533
 Step 12/13 : WORKDIR /race/files/pkg
  ---> Using cache
- ---> a8cbf01ed7de
+ ---> 8f45e90b9aa5
 Step 13/13 : RUN pip3 install -r requirements.txt
  ---> Using cache
- ---> 4d1d51328275
-Successfully built 4d1d51328275
+ ---> 240e8e516dba
+Successfully built 240e8e516dba
 Successfully tagged hmcar_image:latest
 running Driver import line: from pkg.drivers import DisparityExtender as Driver
-Connecting to port 54959...
+Connecting to port 52257...
 speed:  20
 speed:  20
 speed:  20
@@ -2043,83 +2043,4 @@ speed:  11
 speed:  11
 speed:  11
 speed:  11
-speed:  11
-speed:  11
-speed:  11
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-speed:  9
-got 'exit' or None: None
+got 'exit' or None: {'type': 'exit'}

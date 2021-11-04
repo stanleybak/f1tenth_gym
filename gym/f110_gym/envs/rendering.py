@@ -93,7 +93,9 @@ class EnvRenderer(pyglet.window.Window):
         self.vertices = None
 
         # rgb values for cars
-        self.rgbs = [[0, 255, 0],
+        self.rgbs = [
+         [255, 255, 255],
+         [0, 255, 0],
          [255, 0, 0],
          [0, 255, 255],
          [255, 255, 0],
@@ -104,11 +106,7 @@ class EnvRenderer(pyglet.window.Window):
          [255, 165, 0],
          [173, 255, 47],
          [255, 218, 185],
-         [255, 165, 0],
-         [0, 255, 255],
-         [255, 255, 0],
-         [255, 0, 255],
-         [135, 206, 235]]
+         [255, 165, 0]]
 
         # current score label
         self.score_label = pyglet.text.Label(
