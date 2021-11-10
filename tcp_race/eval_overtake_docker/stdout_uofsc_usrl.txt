@@ -1,0 +1,55 @@
+Running in Docker using container name uofsc_usrl_id14_container and image name uofsc_usrl_image.
+Sending build context to Docker daemon  42.54MB
+Step 1/13 : FROM ros:noetic-robot-focal
+ ---> 8b211266230d
+Step 2/13 : RUN echo "Starting..."
+ ---> Using cache
+ ---> 132d939a8cce
+Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
+ ---> Using cache
+ ---> 192880db760e
+Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
+ ---> Using cache
+ ---> a9bce34ba3cc
+Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
+ ---> Using cache
+ ---> d4cf8dc869f3
+Step 6/13 : WORKDIR /race
+ ---> Using cache
+ ---> 7507c261a285
+Step 7/13 : ADD "./${TARFILE}" /race/files
+ ---> Using cache
+ ---> 48f10c355811
+Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
+ ---> Using cache
+ ---> 8db309f4e9c9
+Step 9/13 : COPY ./networking.py .
+ ---> Using cache
+ ---> 3d41515b5514
+Step 10/13 : COPY ./riders_client_tcp_race.py .
+ ---> Using cache
+ ---> e78beaaa6088
+Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
+ ---> Using cache
+ ---> 45422e9954eb
+Step 12/13 : WORKDIR /race/files/pkg
+ ---> Using cache
+ ---> 1c56b3e3c67e
+Step 13/13 : RUN pip3 install -r requirements.txt
+ ---> Using cache
+ ---> 1442ea3f5d49
+Successfully built 1442ea3f5d49
+Successfully tagged uofsc_usrl_image:latest
+running Driver import line: from pkg.drivers import RRT as Driver
+Aligning...
+transposing...
+waiting
+We are READY TO RUMBLE!!!
+Connecting to port 45009...
+/race/files/pkg/src/pkg/drivers.py:91: FutureWarning: `draw.circle` is deprecated in favor of `draw.disk`.`draw.circle` will be removed in version 0.19
+  self.scan_buffer = np.transpose(circle(0, 0, self.buffer))
+/race/files/pkg/src/pkg/drivers.py:117: FutureWarning: `draw.circle` is deprecated in favor of `draw.disk`.`draw.circle` will be removed in version 0.19
+  self.neighborhood_stamp = np.transpose(circle(0, 0, self.neighborhood_radius))
+/race/files/pkg/src/pkg/drivers.py:201: FutureWarning: `draw.circle` is deprecated in favor of `draw.disk`.`draw.circle` will be removed in version 0.19
+  sample_space = np.transpose(circle(mx, my, self.sample_width, (self.width, self.height)))
+got 'exit' or None: {'type': 'exit'}

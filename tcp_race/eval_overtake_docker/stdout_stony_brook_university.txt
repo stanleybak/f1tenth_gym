@@ -1,0 +1,781 @@
+Running in Docker using container name stony_brook_university_id1_container and image name stony_brook_university_image.
+Sending build context to Docker daemon  42.54MB
+Step 1/13 : FROM ros:noetic-robot-focal
+ ---> 8b211266230d
+Step 2/13 : RUN echo "Starting..."
+ ---> Using cache
+ ---> 132d939a8cce
+Step 3/13 : RUN apt-get update && apt-get install -y python3-pip ros-noetic-ackermann-msgs
+ ---> Using cache
+ ---> 192880db760e
+Step 4/13 : ARG TARFILE="dockerfile-needs-arg.tar.gz"
+ ---> Using cache
+ ---> a9bce34ba3cc
+Step 5/13 : RUN echo "Starting with tarfile $TARFILE..."
+ ---> Using cache
+ ---> 1f804ababdef
+Step 6/13 : WORKDIR /race
+ ---> Using cache
+ ---> 3f2f450437df
+Step 7/13 : ADD "./${TARFILE}" /race/files
+ ---> Using cache
+ ---> e581480a3523
+Step 8/13 : RUN mkdir /catkin_ws && mkdir /catkin_ws/src && cp -r /race/files/pkg /catkin_ws/src/pkg
+ ---> Using cache
+ ---> 5299a0b9a2b3
+Step 9/13 : COPY ./networking.py .
+ ---> Using cache
+ ---> 4e466e3f51c8
+Step 10/13 : COPY ./riders_client_tcp_race.py .
+ ---> Using cache
+ ---> cf3ec009fd8a
+Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
+ ---> Using cache
+ ---> feb6b9421ac3
+Step 12/13 : WORKDIR /race/files/pkg
+ ---> Using cache
+ ---> ce0cf1d13974
+Step 13/13 : RUN pip3 install -r requirements.txt
+ ---> Using cache
+ ---> db297b396301
+Successfully built db297b396301
+Successfully tagged stony_brook_university_image:latest
+running Driver import line: from pkg.switching import SwitchingDriver as Driver
+loaded 34 gains from file
+loaded 2272 from file
+loaded 2287 gains from file
+loaded 25 Crashes counts from file
+Connecting to port 45009...
+0.02091021905951207
+step: 1, driver: 0, cmd: 20, 0. {'pose_x': 0.8007017, 'pose_y': -0.2753365, 'pose_theta': 4.1421595, 'linear_vel_x': 0.0, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021946392116848457
+step: 2, driver: 0, cmd: 20, 0. {'pose_x': 0.8007017, 'pose_y': -0.2753365, 'pose_theta': 4.1421595, 'linear_vel_x': 0.0951, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019790811857615775
+step: 3, driver: 0, cmd: 20, 0. {'pose_x': 0.8001883262021967, 'pose_y': -0.27613703003924217, 'pose_theta': 4.1421595, 'linear_vel_x': 0.1902, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01570927032492664
+step: 4, driver: 0, cmd: 20, 0. {'pose_x': 0.7991615786065903, 'pose_y': -0.27773809011772654, 'pose_theta': 4.1421595, 'linear_vel_x': 0.2853, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020016775921517294
+step: 5, driver: 0, cmd: 20, 0. {'pose_x': 0.7976214572131807, 'pose_y': -0.28013968023545316, 'pose_theta': 4.1421595, 'linear_vel_x': 0.3804, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017766480252913497
+step: 6, driver: 0, cmd: 20, 0. {'pose_x': 0.7955679620219679, 'pose_y': -0.28334180039242196, 'pose_theta': 4.1421595, 'linear_vel_x': 0.47550000000000003, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.0202875170848964
+step: 7, driver: 0, cmd: 20, 0. {'pose_x': 0.7930010930329519, 'pose_y': -0.28734445058863295, 'pose_theta': 4.1421595, 'linear_vel_x': 0.5706, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01913059116072624
+step: 8, driver: 0, cmd: 20, 0. {'pose_x': 0.7899208502461326, 'pose_y': -0.2921476308240861, 'pose_theta': 4.1421595, 'linear_vel_x': 0.6657, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01881469736921082
+step: 9, driver: 0, cmd: 20, 0. {'pose_x': 0.7863272336615101, 'pose_y': -0.2977513410987815, 'pose_theta': 4.1421595, 'linear_vel_x': 0.7607999999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016756435337172637
+step: 10, driver: 0, cmd: 20, 0. {'pose_x': 0.7822202432790845, 'pose_y': -0.30415558141271903, 'pose_theta': 4.1421595, 'linear_vel_x': 0.8558999999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018780076171647897
+step: 11, driver: 0, cmd: 20, 0. {'pose_x': 0.7775998790988556, 'pose_y': -0.3113603517658988, 'pose_theta': 4.1421595, 'linear_vel_x': 0.9509999999999998, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017582898256415902
+step: 12, driver: 0, cmd: 20, 0. {'pose_x': 0.7724661411208236, 'pose_y': -0.3193656521583208, 'pose_theta': 4.1421595, 'linear_vel_x': 1.0460999999999998, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019589982348390933
+step: 13, driver: 0, cmd: 20, 0. {'pose_x': 0.7668190293449884, 'pose_y': -0.32817148258998496, 'pose_theta': 4.1421595, 'linear_vel_x': 1.1411999999999998, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019415098997932034
+step: 14, driver: 0, cmd: 20, 0. {'pose_x': 0.7606585437713499, 'pose_y': -0.3377778430608913, 'pose_theta': 4.1421595, 'linear_vel_x': 1.2362999999999997, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.023590363425934346
+step: 15, driver: 0, cmd: 20, 0. {'pose_x': 0.7539846843999082, 'pose_y': -0.34818473357103985, 'pose_theta': 4.1421595, 'linear_vel_x': 1.3313999999999997, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02161039811939447
+step: 16, driver: 0, cmd: 20, 0. {'pose_x': 0.7467974512306633, 'pose_y': -0.35939215412043063, 'pose_theta': 4.1421595, 'linear_vel_x': 1.4264999999999997, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021889243899773092
+step: 17, driver: 0, cmd: 20, 0. {'pose_x': 0.7390968442636152, 'pose_y': -0.3714001047090636, 'pose_theta': 4.1421595, 'linear_vel_x': 1.5215999999999996, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018922089529833208
+step: 18, driver: 0, cmd: 20, 0. {'pose_x': 0.730882863498764, 'pose_y': -0.38420858533693875, 'pose_theta': 4.1421595, 'linear_vel_x': 1.6166999999999996, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017310153476303936
+step: 19, driver: 0, cmd: 20, 0. {'pose_x': 0.7221555089361095, 'pose_y': -0.3978175960040561, 'pose_theta': 4.1421595, 'linear_vel_x': 1.7117999999999995, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020276387726344325
+step: 20, driver: 0, cmd: 20, 0. {'pose_x': 0.7129147805756517, 'pose_y': -0.4122271367104156, 'pose_theta': 4.1421595, 'linear_vel_x': 1.8068999999999995, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016617711166993843
+step: 21, driver: 0, cmd: 20, 0. {'pose_x': 0.7031606784173908, 'pose_y': -0.4274372074560173, 'pose_theta': 4.1421595, 'linear_vel_x': 1.9019999999999995, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018191794555313834
+step: 22, driver: 0, cmd: 20, 0. {'pose_x': 0.6928932024613267, 'pose_y': -0.4434478082408613, 'pose_theta': 4.1421595, 'linear_vel_x': 1.9970999999999994, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01783277547993023
+step: 23, driver: 0, cmd: 20, 0. {'pose_x': 0.6821123527074594, 'pose_y': -0.4602589390649474, 'pose_theta': 4.1421595, 'linear_vel_x': 2.0921999999999996, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01700817528535392
+step: 24, driver: 0, cmd: 20, 0. {'pose_x': 0.6708181291557889, 'pose_y': -0.47787059992827574, 'pose_theta': 4.1421595, 'linear_vel_x': 2.1872999999999996, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021327689603336086
+step: 25, driver: 0, cmd: 20, 0. {'pose_x': 0.6590105318063152, 'pose_y': -0.49628279083084625, 'pose_theta': 4.1421595, 'linear_vel_x': 2.2823999999999995, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016905302251639664
+step: 26, driver: 0, cmd: 20, 0. {'pose_x': 0.6466895606590383, 'pose_y': -0.515495511772659, 'pose_theta': 4.1421595, 'linear_vel_x': 2.3774999999999995, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.023065248625934398
+step: 27, driver: 0, cmd: 20, 0. {'pose_x': 0.6338552157139581, 'pose_y': -0.5355087627537138, 'pose_theta': 4.1421595, 'linear_vel_x': 2.4725999999999995, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01575579240549896
+step: 28, driver: 0, cmd: 20, 0. {'pose_x': 0.6205074969710748, 'pose_y': -0.5563225437740109, 'pose_theta': 4.1421595, 'linear_vel_x': 2.5676999999999994, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016345828018963005
+step: 29, driver: 0, cmd: 20, 0. {'pose_x': 0.6066464044303882, 'pose_y': -0.5779368548335502, 'pose_theta': 4.1421595, 'linear_vel_x': 2.6627999999999994, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017484299733697917
+step: 30, driver: 0, cmd: 20, 0. {'pose_x': 0.5922719380918985, 'pose_y': -0.6003516959323317, 'pose_theta': 4.1421595, 'linear_vel_x': 2.7578999999999994, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018182138371045875
+step: 31, driver: 0, cmd: 20, 0. {'pose_x': 0.5773840979556055, 'pose_y': -0.6235670670703555, 'pose_theta': 4.1421595, 'linear_vel_x': 2.8529999999999993, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016556819919447685
+step: 32, driver: 0, cmd: 20, 0. {'pose_x': 0.5619828840215093, 'pose_y': -0.6475829682476214, 'pose_theta': 4.1421595, 'linear_vel_x': 2.9480999999999993, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01868953331177181
+step: 33, driver: 0, cmd: 20, 0. {'pose_x': 0.54606829628961, 'pose_y': -0.6723993994641295, 'pose_theta': 4.1421595, 'linear_vel_x': 3.0431999999999992, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018075606038857828
+step: 34, driver: 0, cmd: 20, 0. {'pose_x': 0.5296403347599073, 'pose_y': -0.6980163607198798, 'pose_theta': 4.1421595, 'linear_vel_x': 3.138299999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018206265655971166
+step: 35, driver: 0, cmd: 20, 0. {'pose_x': 0.5126989994324016, 'pose_y': -0.7244338520148723, 'pose_theta': 4.1421595, 'linear_vel_x': 3.233399999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01955880960701295
+step: 36, driver: 0, cmd: 20, 0. {'pose_x': 0.4952442903070926, 'pose_y': -0.751651873349107, 'pose_theta': 4.1421595, 'linear_vel_x': 3.328499999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01809304333055195
+step: 37, driver: 0, cmd: 20, 0. {'pose_x': 0.4772762073839804, 'pose_y': -0.7796704247225839, 'pose_theta': 4.1421595, 'linear_vel_x': 3.423599999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022273643875873272
+step: 38, driver: 0, cmd: 20, 0. {'pose_x': 0.458794750663065, 'pose_y': -0.8084895061353029, 'pose_theta': 4.1421595, 'linear_vel_x': 3.518699999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021603328092126617
+step: 39, driver: 0, cmd: 20, 0. {'pose_x': 0.43979992014434643, 'pose_y': -0.8381091175872641, 'pose_theta': 4.1421595, 'linear_vel_x': 3.613799999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020256985679153794
+step: 40, driver: 0, cmd: 20, 0. {'pose_x': 0.42029171582782465, 'pose_y': -0.8685292590784676, 'pose_theta': 4.1421595, 'linear_vel_x': 3.708899999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017166205868153206
+step: 41, driver: 0, cmd: 20, 0. {'pose_x': 0.4002701377134996, 'pose_y': -0.8997499306089133, 'pose_theta': 4.1421595, 'linear_vel_x': 3.803999999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019844622545218793
+step: 42, driver: 0, cmd: 20, 0. {'pose_x': 0.3797351858013714, 'pose_y': -0.9317711321786012, 'pose_theta': 4.1421595, 'linear_vel_x': 3.899099999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02306237142180123
+step: 43, driver: 0, cmd: 20, 0. {'pose_x': 0.35868686009143996, 'pose_y': -0.9645928637875313, 'pose_theta': 4.1421595, 'linear_vel_x': 3.994199999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019936996850403954
+step: 44, driver: 0, cmd: 20, 0. {'pose_x': 0.33712516058370534, 'pose_y': -0.9982151254357036, 'pose_theta': 4.1421595, 'linear_vel_x': 4.089299999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017742321406972072
+step: 45, driver: 0, cmd: 20, 0. {'pose_x': 0.3150500872781675, 'pose_y': -1.032637917123118, 'pose_theta': 4.1421595, 'linear_vel_x': 4.184399999999999, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019662859017133938
+step: 46, driver: 0, cmd: 20, 0. {'pose_x': 0.29246164017482645, 'pose_y': -1.0678612388497746, 'pose_theta': 4.1421595, 'linear_vel_x': 4.2795, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02017633966574639
+step: 47, driver: 0, cmd: 20, 0. {'pose_x': 0.2693598192736822, 'pose_y': -1.1038850906156734, 'pose_theta': 4.1421595, 'linear_vel_x': 4.3746, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022561112593114996
+step: 48, driver: 0, cmd: 20, 0. {'pose_x': 0.24574462457473473, 'pose_y': -1.1407094724208144, 'pose_theta': 4.1421595, 'linear_vel_x': 4.4697000000000005, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02144331462917748
+step: 49, driver: 0, cmd: 20, 0. {'pose_x': 0.22161605607798407, 'pose_y': -1.1783343842651977, 'pose_theta': 4.1421595, 'linear_vel_x': 4.564800000000001, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.023237871784960618
+step: 50, driver: 0, cmd: 20, 0. {'pose_x': 0.1969741137834302, 'pose_y': -1.216759826148823, 'pose_theta': 4.1421595, 'linear_vel_x': 4.659900000000001, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01774893258510868
+step: 51, driver: 0, cmd: 20, 0. {'pose_x': 0.1718187976910731, 'pose_y': -1.2559857980716906, 'pose_theta': 4.1421595, 'linear_vel_x': 4.755000000000002, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021932771482400915
+step: 52, driver: 0, cmd: 20, 0. {'pose_x': 0.1461501078009128, 'pose_y': -1.2960123000338004, 'pose_theta': 4.1421595, 'linear_vel_x': 4.850100000000002, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018761101854943618
+step: 53, driver: 0, cmd: 20, 0. {'pose_x': 0.11996804411294931, 'pose_y': -1.3368393320351524, 'pose_theta': 4.1421595, 'linear_vel_x': 4.9452000000000025, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019736559969592005
+step: 54, driver: 0, cmd: 20, 0. {'pose_x': 0.0932726066271826, 'pose_y': -1.3784668940757467, 'pose_theta': 4.1421595, 'linear_vel_x': 5.040300000000003, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017628907524893656
+step: 55, driver: 0, cmd: 20, 0. {'pose_x': 0.06606379534361269, 'pose_y': -1.4208949861555833, 'pose_theta': 4.1421595, 'linear_vel_x': 5.135400000000003, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019424611417271365
+step: 56, driver: 0, cmd: 20, 0. {'pose_x': 0.03834161026223956, 'pose_y': -1.464123608274662, 'pose_theta': 4.1421595, 'linear_vel_x': 5.230500000000004, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016283674456198827
+step: 57, driver: 0, cmd: 20, 0. {'pose_x': 0.010106051383063232, 'pose_y': -1.508152760432983, 'pose_theta': 4.1421595, 'linear_vel_x': 5.325600000000004, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01765044862239895
+step: 58, driver: 0, cmd: 20, 0. {'pose_x': -0.018642881293916305, 'pose_y': -1.552982442630546, 'pose_theta': 4.1421595, 'linear_vel_x': 5.4207000000000045, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019780114587467423
+step: 59, driver: 0, cmd: 20, 0. {'pose_x': -0.04790518776869905, 'pose_y': -1.5986126548673514, 'pose_theta': 4.1421595, 'linear_vel_x': 5.515800000000005, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017979721153270622
+step: 60, driver: 0, cmd: 20, 0. {'pose_x': -0.077680868041285, 'pose_y': -1.6450433971433989, 'pose_theta': 4.1421595, 'linear_vel_x': 5.610900000000005, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022285796950620274
+step: 61, driver: 0, cmd: 20, 0. {'pose_x': -0.10796992211167417, 'pose_y': -1.6922746694586885, 'pose_theta': 4.1421595, 'linear_vel_x': 5.706000000000006, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022210390120708468
+step: 62, driver: 0, cmd: 20, 0. {'pose_x': -0.13877234997986654, 'pose_y': -1.7403064718132204, 'pose_theta': 4.1421595, 'linear_vel_x': 5.801100000000006, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02132285185655025
+step: 63, driver: 0, cmd: 20, 0. {'pose_x': -0.1700881516458621, 'pose_y': -1.7891388042069944, 'pose_theta': 4.1421595, 'linear_vel_x': 5.8962000000000065, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02572210356334992
+step: 64, driver: 0, cmd: 20, 0. {'pose_x': -0.2019173271096609, 'pose_y': -1.8387716666400107, 'pose_theta': 4.1421595, 'linear_vel_x': 5.991300000000007, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01770597194305168
+step: 65, driver: 0, cmd: 20, 0. {'pose_x': -0.2342598763712629, 'pose_y': -1.889205059112269, 'pose_theta': 4.1421595, 'linear_vel_x': 6.086400000000007, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018813423735563384
+step: 66, driver: 0, cmd: 20, 0. {'pose_x': -0.2671157994306681, 'pose_y': -1.9404389816237697, 'pose_theta': 4.1421595, 'linear_vel_x': 6.181500000000008, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018444923006041614
+step: 67, driver: 0, cmd: 20, 0. {'pose_x': -0.3004850962878765, 'pose_y': -1.9924734341745125, 'pose_theta': 4.1421595, 'linear_vel_x': 6.276600000000008, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016242364787437458
+step: 68, driver: 0, cmd: 20, 0. {'pose_x': -0.3343677669428881, 'pose_y': -2.0453084167644975, 'pose_theta': 4.1421595, 'linear_vel_x': 6.371700000000009, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018099052897373347
+step: 69, driver: 0, cmd: 20, 0. {'pose_x': -0.3687638113957029, 'pose_y': -2.098943929393725, 'pose_theta': 4.1421595, 'linear_vel_x': 6.466800000000009, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019562638059009263
+step: 70, driver: 0, cmd: 20, 0. {'pose_x': -0.40367322964632096, 'pose_y': -2.1533799720621944, 'pose_theta': 4.1421595, 'linear_vel_x': 6.561900000000009, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016714482667504083
+step: 71, driver: 0, cmd: 20, 0. {'pose_x': -0.4390960216947422, 'pose_y': -2.208616544769906, 'pose_theta': 4.1421595, 'linear_vel_x': 6.65700000000001, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02142036163740002
+step: 72, driver: 0, cmd: 20, 0. {'pose_x': -0.47503218754096665, 'pose_y': -2.26465364751686, 'pose_theta': 4.1421595, 'linear_vel_x': 6.75210000000001, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017189934120766637
+step: 73, driver: 0, cmd: 20, 0. {'pose_x': -0.5114817271849943, 'pose_y': -2.3214912803030563, 'pose_theta': 4.1421595, 'linear_vel_x': 6.847200000000011, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019964963605351826
+step: 74, driver: 0, cmd: 20, 0. {'pose_x': -0.5484446406268252, 'pose_y': -2.3791294431284946, 'pose_theta': 4.1421595, 'linear_vel_x': 6.942300000000011, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02113486501812467
+step: 75, driver: 0, cmd: 20, 0. {'pose_x': -0.5859209278664592, 'pose_y': -2.437568135993175, 'pose_theta': 4.1421595, 'linear_vel_x': 7.037400000000011, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020765540632341484
+step: 76, driver: 0, cmd: 20, 0. {'pose_x': -0.6239105889038965, 'pose_y': -2.496807358897098, 'pose_theta': 4.1421595, 'linear_vel_x': 7.132500000000012, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01982214113462888
+step: 77, driver: 0, cmd: 20, 0. {'pose_x': -0.662413623739137, 'pose_y': -2.5568471118402627, 'pose_theta': 4.1421595, 'linear_vel_x': 7.227600000000012, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02153812665087429
+step: 78, driver: 0, cmd: 20, 0. {'pose_x': -0.7014300323721807, 'pose_y': -2.6176873948226698, 'pose_theta': 4.1421595, 'linear_vel_x': 7.322700000000013, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018920216548636515
+step: 79, driver: 0, cmd: 20, 0. {'pose_x': -0.7409598148030276, 'pose_y': -2.679328207844319, 'pose_theta': 4.1421595, 'linear_vel_x': 7.4177519480519605, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017226286095226584
+step: 80, driver: 0, cmd: 20, 0. {'pose_x': -0.7810027116351366, 'pose_y': -2.741769146414907, 'pose_theta': 4.1421595, 'linear_vel_x': 7.5115858892344765, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01741995928929896
+step: 81, driver: 0, cmd: 20, 0. {'pose_x': -0.8215521477600711, 'pose_y': -2.8049999576313107, 'pose_theta': 4.1421595, 'linear_vel_x': 7.604247666689162, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019244846805687832
+step: 82, driver: 0, cmd: 20, 0. {'pose_x': -0.8626017955422413, 'pose_y': -2.8690107744874838, 'pose_theta': 4.1421595, 'linear_vel_x': 7.695780311404171, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018592995273198132
+step: 83, driver: 0, cmd: 20, 0. {'pose_x': -0.9041455596381897, 'pose_y': -2.9337920922023915, 'pose_theta': 4.1421595, 'linear_vel_x': 7.786224278336096, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020332036343769566
+step: 84, driver: 0, cmd: 20, 0. {'pose_x': -0.9461775630905233, 'pose_y': -2.9993347465355664, 'pose_theta': 4.1421595, 'linear_vel_x': 7.875617657606792, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02170122308970246
+step: 85, driver: 0, cmd: 20, 0. {'pose_x': -0.9886921345619385, 'pose_y': -3.065629893880472, 'pose_theta': 4.1421595, 'linear_vel_x': 7.963996363920414, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02007030287726219
+step: 86, driver: 0, cmd: 20, 0. {'pose_x': -1.0316837965917676, 'pose_y': -3.132668992952332, 'pose_theta': 4.1421595, 'linear_vel_x': 8.051394306886998, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019208947965657752
+step: 87, driver: 0, cmd: 20, 0. {'pose_x': -1.0751472547719745, 'pose_y': -3.2004437879097103, 'pose_theta': 4.1421595, 'linear_vel_x': 8.137843544555636, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017493443454285718
+step: 88, driver: 0, cmd: 20, 0. {'pose_x': -1.1190773877519622, 'pose_y': -3.2689462927684905, 'pose_theta': 4.1421595, 'linear_vel_x': 8.22337442213876, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016428755433348652
+step: 89, driver: 0, cmd: 20, 0. {'pose_x': -1.1634692379922473, 'pose_y': -3.3381687769836117, 'pose_theta': 4.1421595, 'linear_vel_x': 8.308015697638284, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018666294484430024
+step: 90, driver: 0, cmd: 20, 0. {'pose_x': -1.208318003196298, 'pose_y': -3.4081037520882926, 'pose_theta': 4.1421595, 'linear_vel_x': 8.39179465585545, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019362167528273744
+step: 91, driver: 0, cmd: 20, 0. {'pose_x': -1.2536190283578243, 'pose_y': -3.4787439592929656, 'pose_theta': 4.1421595, 'linear_vel_x': 8.474737212071878, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018008969554526355
+step: 92, driver: 0, cmd: 20, 0. {'pose_x': -1.2993677983677665, 'pose_y': -3.550082357956974, 'pose_theta': 4.1421595, 'linear_vel_x': 8.556868006523949, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019349885349390417
+step: 93, driver: 0, cmd: 20, 0. {'pose_x': -1.345559931131278, 'pose_y': -3.6221121148555326, 'pose_theta': 4.1421595, 'linear_vel_x': 8.63821049065124, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017578287797113124
+step: 94, driver: 0, cmd: 20, 0. {'pose_x': -1.3921911711503014, 'pose_y': -3.6948265941727083, 'pose_theta': 4.1421595, 'linear_vel_x': 8.718787005978493, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018969971045923018
+step: 95, driver: 0, cmd: 20, 0. {'pose_x': -1.4392573835319673, 'pose_y': -3.7682193481584108, 'pose_theta': 4.1421595, 'linear_vel_x': 8.798618856386437, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01831369118335635
+step: 96, driver: 0, cmd: 20, 0. {'pose_x': -1.4867545483871303, 'pose_y': -3.8422841083937436, 'pose_theta': 4.1421595, 'linear_vel_x': 8.877726374436817, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01663575746053647
+step: 97, driver: 0, cmd: 20, 0. {'pose_x': -1.5346787555869443, 'pose_y': -3.9170147776146624, 'pose_theta': 4.1421595, 'linear_vel_x': 8.956128982339242, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02099972171290565
+step: 98, driver: 0, cmd: 20, 0. {'pose_x': -1.5830261998485518, 'pose_y': -3.992405422048839, 'pose_theta': 4.1421595, 'linear_vel_x': 9.033845248080002, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019171600035958525
+step: 99, driver: 0, cmd: 20, 0. {'pose_x': -1.6317931761237703, 'pose_y': -4.068450264225006, 'pose_theta': 4.1421595, 'linear_vel_x': 9.110892937174292, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020956570288401366
+step: 100, driver: 0, cmd: 20, 0. {'pose_x': -1.6809760752671516, 'pose_y': -4.145143676217935, 'pose_theta': 4.1421595, 'linear_vel_x': 9.187289060452178, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017723028364481586
+step: 101, driver: 0, cmd: 20, 0. {'pose_x': -1.730571379962001, 'pose_y': -4.2224801732956765, 'pose_theta': 4.1421595, 'linear_vel_x': 9.26304991824386, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.0175831081286294
+step: 102, driver: 0, cmd: 20, 0. {'pose_x': -1.7805756608849193, 'pose_y': -4.3004544079387275, 'pose_theta': 4.1421595, 'linear_vel_x': 9.338191141290617, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016795262387381826
+step: 103, driver: 0, cmd: 20, 0. {'pose_x': -1.8309855730911928, 'pose_y': -4.379061164203591, 'pose_theta': 4.1421595, 'linear_vel_x': 9.412727728673406, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01785888764813559
+step: 104, driver: 0, cmd: 20, 0. {'pose_x': -1.8817978526049322, 'pose_y': -4.4582953524056, 'pose_theta': 4.1421595, 'linear_vel_x': 9.486674083020798, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022739188348169126
+step: 105, driver: 0, cmd: 20, 0. {'pose_x': -1.9330093131992712, 'pose_y': -4.538152004098119, 'pose_theta': 4.1421595, 'linear_vel_x': 9.56004404323117, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017737690579487264
+step: 106, driver: 0, cmd: 20, 0. {'pose_x': -1.9846168433532092, 'pose_y': -4.618626267327194, 'pose_theta': 4.1421595, 'linear_vel_x': 9.632850914920512, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.028709881469829224
+step: 107, driver: 0, cmd: 20, 0. {'pose_x': -2.0366174033728184, 'pose_y': -4.6997134021425, 'pose_theta': 4.1421595, 'linear_vel_x': 9.705107498786239, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016663022878160128
+step: 108, driver: 0, cmd: 20, 0. {'pose_x': -2.0890080226655656, 'pose_y': -4.781408776347054, 'pose_theta': 4.1421595, 'linear_vel_x': 9.776826117058839, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018407077566804042
+step: 109, driver: 0, cmd: 20, 0. {'pose_x': -2.1417857971574277, 'pose_y': -4.8637078614695906, 'pose_theta': 4.1421595, 'linear_vel_x': 9.84801863819671, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017521908854694068
+step: 110, driver: 0, cmd: 20, 0. {'pose_x': -2.194947886843314, 'pose_y': -4.946606228944812, 'pose_theta': 4.1421595, 'linear_vel_x': 9.918696499964796, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019631838172889493
+step: 111, driver: 0, cmd: 20, 0. {'pose_x': -2.248491513462076, 'pose_y': -5.0300995464879055, 'pose_theta': 4.1421595, 'linear_vel_x': 9.988870731024539, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020406471323293762
+step: 112, driver: 0, cmd: 20, 0. {'pose_x': -2.3024139582880627, 'pose_y': -5.114183574650811, 'pose_theta': 4.1421595, 'linear_vel_x': 10.05855197115093, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016847470332480352
+step: 113, driver: 0, cmd: 20, 0. {'pose_x': -2.3567125600318133, 'pose_y': -5.198854163548657, 'pose_theta': 4.1421595, 'linear_vel_x': 10.127750490181931, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017699697106399626
+step: 114, driver: 0, cmd: 20, 0. {'pose_x': -2.4113847128430432, 'pose_y': -5.284107249745718, 'pose_theta': 4.1421595, 'linear_vel_x': 10.196476205796149, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020380777614317225
+step: 115, driver: 0, cmd: 20, 0. {'pose_x': -2.4664278644096003, 'pose_y': -5.369938853291019, 'pose_theta': 4.1421595, 'linear_vel_x': 10.264738700206163, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018726675964119366
+step: 116, driver: 0, cmd: 20, 0. {'pose_x': -2.5218395141465337, 'pose_y': -5.456345074894457, 'pose_theta': 4.1421595, 'linear_vel_x': 10.332547235847311, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017589063148449213
+step: 117, driver: 0, cmd: 20, 0. {'pose_x': -2.577617211469856, 'pose_y': -5.543322093234989, 'pose_theta': 4.1421595, 'linear_vel_x': 10.399910770134888, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.0187296851615415
+step: 118, driver: 0, cmd: 20, 0. {'pose_x': -2.6337585541499675, 'pose_y': -5.6308661623930485, 'pose_theta': 4.1421595, 'linear_vel_x': 10.466837969356519, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018516887135378024
+step: 119, driver: 0, cmd: 20, 0. {'pose_x': -2.6902611867400763, 'pose_y': -5.718973609399891, 'pose_theta': 4.1421595, 'linear_vel_x': 10.533337221760899, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018294298048376234
+step: 120, driver: 0, cmd: 20, 0. {'pose_x': -2.7471227990752736, 'pose_y': -5.807640831897131, 'pose_theta': 4.1421595, 'linear_vel_x': 10.599416649899025, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016095773164547467
+step: 121, driver: 0, cmd: 20, 0. {'pose_x': -2.8043411248382304, 'pose_y': -5.89686429590016, 'pose_theta': 4.1421595, 'linear_vel_x': 10.665084122269462, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02056810773747042
+step: 122, driver: 0, cmd: 20, 0. {'pose_x': -2.8619139401877587, 'pose_y': -5.986640533659589, 'pose_theta': 4.1421595, 'linear_vel_x': 10.730347264315068, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019101941303901304
+step: 123, driver: 0, cmd: 20, 0. {'pose_x': -2.919839062446735, 'pose_y': -6.076966141615262, 'pose_theta': 4.1421595, 'linear_vel_x': 10.795213468814781, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018766197114221228
+step: 124, driver: 0, cmd: 20, 0. {'pose_x': -2.9781143488461224, 'pose_y': -6.167837778437746, 'pose_theta': 4.1421595, 'linear_vel_x': 10.859689905710699, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01993410335479251
+step: 125, driver: 0, cmd: 20, 0. {'pose_x': -3.036737695322041, 'pose_y': -6.259252163152538, 'pose_theta': 4.1421595, 'linear_vel_x': 10.923783531407505, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01911954020923634
+step: 126, driver: 0, cmd: 20, 0. {'pose_x': -3.0957070353630374, 'pose_y': -6.351206073342558, 'pose_theta': 4.1421595, 'linear_vel_x': 10.987501097578493, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018462136752607883
+step: 127, driver: 0, cmd: 20, 0. {'pose_x': -3.155020338904896, 'pose_y': -6.443696343424769, 'pose_theta': 4.1421595, 'linear_vel_x': 11.050849159509827, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017941985614209344
+step: 128, driver: 0, cmd: 20, 0. {'pose_x': -3.2146756112704895, 'pose_y': -6.536719862997029, 'pose_theta': 4.1421595, 'linear_vel_x': 11.113834084012305, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021215760263067818
+step: 129, driver: 0, cmd: 20, 0. {'pose_x': -3.2746708921523413, 'pose_y': -6.630273575251557, 'pose_theta': 4.1421595, 'linear_vel_x': 11.176462056927726, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02249559523088429
+step: 130, driver: 0, cmd: 20, 0. {'pose_x': -3.3350042546357104, 'pose_y': -6.7243544754515705, 'pose_theta': 4.1421595, 'linear_vel_x': 11.238739090254972, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01799337481388008
+step: 131, driver: 0, cmd: 20, 0. {'pose_x': -3.395673804260143, 'pose_y': -6.8189596094679175, 'pose_theta': 4.1421595, 'linear_vel_x': 11.300671028919117, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018004993818797055
+step: 132, driver: 0, cmd: 20, 0. {'pose_x': -3.456677678117565, 'pose_y': -6.914086072372689, 'pose_theta': 4.1421595, 'linear_vel_x': 11.362263557205162, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02016585290078088
+step: 133, driver: 0, cmd: 20, 0. {'pose_x': -3.5180140439851084, 'pose_y': -7.0097310070869865, 'pose_theta': 4.1421595, 'linear_vel_x': 11.423522204876525, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018453447590325744
+step: 134, driver: 0, cmd: 20, 0. {'pose_x': -3.5796810994909625, 'pose_y': -7.105891603080193, 'pose_theta': 4.1421595, 'linear_vel_x': 11.484452352996941, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017626620187013664
+step: 135, driver: 0, cmd: 20, 0. {'pose_x': -3.6416770713116566, 'pose_y': -7.202565095118255, 'pose_theta': 4.1421595, 'linear_vel_x': 11.545059239473192, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017742958508641604
+step: 136, driver: 0, cmd: 20, 0. {'pose_x': -3.7040002143992625, 'pose_y': -7.299748762058623, 'pose_theta': 4.1421595, 'linear_vel_x': 11.605347964334838, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020090321919095544
+step: 137, driver: 0, cmd: 20, 0. {'pose_x': -3.7666488112370993, 'pose_y': -7.397439925689626, 'pose_theta': 4.1421595, 'linear_vel_x': 11.66532349476607, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01755381276192758
+step: 138, driver: 0, cmd: 20, 0. {'pose_x': -3.829621171122599, 'pose_y': -7.495635949612213, 'pose_theta': 4.1421595, 'linear_vel_x': 11.72499066990376, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018583723638766925
+step: 139, driver: 0, cmd: 20, 0. {'pose_x': -3.892915629476076, 'pose_y': -7.594334238162081, 'pose_theta': 4.1421595, 'linear_vel_x': 11.784354205414846, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02189502100535279
+step: 140, driver: 0, cmd: 20, 0. {'pose_x': -3.9565305471742045, 'pose_y': -7.693532235370332, 'pose_theta': 4.1421595, 'linear_vel_x': 11.843418697865369, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01843962558729617
+step: 141, driver: 0, cmd: 20, 0. {'pose_x': -4.020464309907082, 'pose_y': -7.79322742396091, 'pose_theta': 4.1421595, 'linear_vel_x': 11.902188628892587, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017066338033716377
+step: 142, driver: 0, cmd: 20, 0. {'pose_x': -4.084715327557815, 'pose_y': -7.893417324383154, 'pose_theta': 4.1421595, 'linear_vel_x': 11.96066836919097, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016593820268193227
+step: 143, driver: 0, cmd: 20, 0. {'pose_x': -4.149282033603622, 'pose_y': -7.99409949387791, 'pose_theta': 4.1421595, 'linear_vel_x': 12.01886218232209, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019519764153677066
+step: 144, driver: 0, cmd: 20, 0. {'pose_x': -4.214162884537502, 'pose_y': -8.095271525575711, 'pose_theta': 4.1421595, 'linear_vel_x': 12.076774228357843, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018831262974136065
+step: 145, driver: 0, cmd: 20, 0. {'pose_x': -4.279356359309573, 'pose_y': -8.196931047625622, 'pose_theta': 4.1421595, 'linear_vel_x': 12.134408567365822, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01903538033246166
+step: 146, driver: 0, cmd: 20, 0. {'pose_x': -4.344860958787222, 'pose_y': -8.299075722353427, 'pose_theta': 4.1421595, 'linear_vel_x': 12.19176916274514, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01834520024882913
+step: 147, driver: 0, cmd: 20, 0. {'pose_x': -4.410675205233263, 'pose_y': -8.401703245447898, 'pose_theta': 4.1421595, 'linear_vel_x': 12.248859884420458, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022954671232044088
+step: 148, driver: 0, cmd: 20, 0. {'pose_x': -4.476797641801341, 'pose_y': -8.504811345173946, 'pose_theta': 4.1421595, 'linear_vel_x': 12.305684511901527, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021630472579828752
+step: 149, driver: 0, cmd: 20, 0. {'pose_x': -4.54322683204785, 'pose_y': -8.608397781611535, 'pose_theta': 4.1421595, 'linear_vel_x': 12.362246737215106, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017980770169591542
+step: 150, driver: 0, cmd: 20, 0. {'pose_x': -4.609961359459674, 'pose_y': -8.712460345919258, 'pose_theta': 4.1421595, 'linear_vel_x': 12.4185501677157, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018306301819294823
+step: 151, driver: 0, cmd: 20, 0. {'pose_x': -4.676999826997107, 'pose_y': -8.816996859621598, 'pose_theta': 4.1421595, 'linear_vel_x': 12.474598328781191, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01736894595734828
+step: 152, driver: 0, cmd: 20, 0. {'pose_x': -4.7443408566513225, 'pose_y': -8.922005173918864, 'pose_theta': 4.1421595, 'linear_vel_x': 12.530394666399062, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017423577627888376
+step: 153, driver: 0, cmd: 20, 0. {'pose_x': -4.811983089015805, 'pose_y': -9.027483169018891, 'pose_theta': 4.1421595, 'linear_vel_x': 12.585942549648617, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016868837635629852
+step: 154, driver: 0, cmd: 20, 0. {'pose_x': -4.879925182871179, 'pose_y': -9.133428753489662, 'pose_theta': 4.1421595, 'linear_vel_x': 12.641245273084252, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016384166441409942
+step: 155, driver: 0, cmd: 20, 0. {'pose_x': -4.948165814782904, 'pose_y': -9.239839863631959, 'pose_theta': 4.1421595, 'linear_vel_x': 12.696306059024542, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01833738903665305
+step: 156, driver: 0, cmd: 20, 0. {'pose_x': -5.0167036787113295, 'pose_y': -9.346714462871306, 'pose_theta': 4.1421595, 'linear_vel_x': 12.751128059751695, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017321339025862414
+step: 157, driver: 0, cmd: 20, 0. {'pose_x': -5.085537485633619, 'pose_y': -9.454050541168417, 'pose_theta': 4.1421595, 'linear_vel_x': 12.805714359625586, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02083559868759255
+step: 158, driver: 0, cmd: 20, 0. {'pose_x': -5.15466596317709, 'pose_y': -9.561846114447444, 'pose_theta': 4.1421595, 'linear_vel_x': 12.860067977116422, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016238684892801558
+step: 159, driver: 0, cmd: 20, 0. {'pose_x': -5.224087855263521, 'pose_y': -9.670099224041328, 'pose_theta': 4.1421595, 'linear_vel_x': 12.914191866759817, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01755026480665922
+step: 160, driver: 0, cmd: 20, 0. {'pose_x': -5.2938019217640235, 'pose_y': -9.778807936153616, 'pose_theta': 4.1421595, 'linear_vel_x': 12.968088921037873, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018103787639154323
+step: 161, driver: 0, cmd: 20, 0. {'pose_x': -5.363806938164054, 'pose_y': -9.887970341336105, 'pose_theta': 4.1421595, 'linear_vel_x': 13.021761972189676, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020472940463613587
+step: 162, driver: 0, cmd: 20, 0. {'pose_x': -5.434101695238212, 'pose_y': -9.997584553981737, 'pose_theta': 4.1421595, 'linear_vel_x': 13.075213793954388, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018484957202946184
+step: 163, driver: 0, cmd: 20, 0. {'pose_x': -5.504684998734439, 'pose_y': -10.107648711832152, 'pose_theta': 4.1421595, 'linear_vel_x': 13.128447103250014, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019955604061513754
+step: 164, driver: 0, cmd: 20, 0. {'pose_x': -5.575555669067288, 'pose_y': -10.218160975499384, 'pose_theta': 4.1421595, 'linear_vel_x': 13.181464561790689, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020185012345026787
+step: 165, driver: 0, cmd: 20, 0. {'pose_x': -5.646712541019916, 'pose_y': -10.32911952800117, 'pose_theta': 4.1421595, 'linear_vel_x': 13.234268777645246, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016354772353583957
+step: 166, driver: 0, cmd: 20, 0. {'pose_x': -5.718154463454491, 'pose_y': -10.440522574309373, 'pose_theta': 4.1421595, 'linear_vel_x': 13.286862306739632, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021500818880012318
+step: 167, driver: 0, cmd: 20, 0. {'pose_x': -5.789880299030718, 'pose_y': -10.552368340911055, 'pose_theta': 4.1421595, 'linear_vel_x': 13.339247654305622, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018002658467953125
+step: 168, driver: 0, cmd: 20, 0. {'pose_x': -5.861888923932173, 'pose_y': -10.664655075381745, 'pose_theta': 4.1421595, 'linear_vel_x': 13.39142727627818, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018408322842025093
+step: 169, driver: 0, cmd: 20, 0. {'pose_x': -5.93417922760019, 'pose_y': -10.777381045970472, 'pose_theta': 4.1421595, 'linear_vel_x': 13.443403580643658, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021557994004225645
+step: 170, driver: 0, cmd: 20, 0. {'pose_x': -6.006750112475019, 'pose_y': -10.890544541196144, 'pose_theta': 4.1421595, 'linear_vel_x': 13.495178928740934, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021989056453643685
+step: 171, driver: 0, cmd: 20, 0. {'pose_x': -6.079600493744015, 'pose_y': -11.004143869454877, 'pose_theta': 4.1421595, 'linear_vel_x': 13.54675563651749, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01891163605324664
+step: 172, driver: 0, cmd: 20, 0. {'pose_x': -6.152729299096601, 'pose_y': -11.118177358637903, 'pose_theta': 4.1421595, 'linear_vel_x': 13.59813597574231, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020456634247199457
+step: 173, driver: 0, cmd: 20, 0. {'pose_x': -6.226135468485783, 'pose_y': -11.232643355759688, 'pose_theta': 4.1421595, 'linear_vel_x': 13.649322175177412, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018021328447991092
+step: 174, driver: 0, cmd: 20, 0. {'pose_x': -6.299817953895986, 'pose_y': -11.347540226595903, 'pose_theta': 4.1421595, 'linear_vel_x': 13.700316421709728, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.0211218424503663
+step: 175, driver: 0, cmd: 20, 0. {'pose_x': -6.3737757191170035, 'pose_y': -11.462866355330938, 'pose_theta': 4.1421595, 'linear_vel_x': 13.751120861444933, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019715736231637138
+step: 176, driver: 0, cmd: 20, 0. {'pose_x': -6.448007739523848, 'pose_y': -11.578620144214606, 'pose_theta': 4.1421595, 'linear_vel_x': 13.801737600764818, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018109541597591594
+step: 177, driver: 0, cmd: 20, 0. {'pose_x': -6.522513001862312, 'pose_y': -11.694800013227757, 'pose_theta': 4.1421595, 'linear_vel_x': 13.852168707349646, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019689447171330254
+step: 178, driver: 0, cmd: 20, 0. {'pose_x': -6.597290504040049, 'pose_y': -11.811404399756508, 'pose_theta': 4.1421595, 'linear_vel_x': 13.902416211166916, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.015236741061109171
+step: 179, driver: 0, cmd: 20, 0. {'pose_x': -6.672339254922989, 'pose_y': -11.92843175827477, 'pose_theta': 4.1421595, 'linear_vel_x': 13.952482105427865, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019532693827236436
+step: 180, driver: 0, cmd: 20, 0. {'pose_x': -6.74765827413692, 'pose_y': -12.045880560034858, 'pose_theta': 4.1421595, 'linear_vel_x': 14.00236834751301, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018329247146212424
+step: 181, driver: 0, cmd: 20, 0. {'pose_x': -6.823246591874061, 'pose_y': -12.16374929276586, 'pose_theta': 4.1421595, 'linear_vel_x': 14.052076859867894, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01724313238421371
+step: 182, driver: 0, cmd: 20, 0. {'pose_x': -6.899103248704481, 'pose_y': -12.282036460379576, 'pose_theta': 4.1421595, 'linear_vel_x': 14.101609530870274, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017483922533696017
+step: 183, driver: 0, cmd: 20, 0. {'pose_x': -6.9752272953921866, 'pose_y': -12.400740582683737, 'pose_theta': 4.1421595, 'linear_vel_x': 14.150968215669785, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.028944003413802433
+step: 184, driver: 0, cmd: 20, 0. {'pose_x': -7.051617792715749, 'pose_y': -12.519860195102298, 'pose_theta': 4.1421595, 'linear_vel_x': 14.200154737001185, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021358245222625527
+step: 185, driver: 0, cmd: 20, 0. {'pose_x': -7.128273811293325, 'pose_y': -12.63939384840258, 'pose_theta': 4.1421595, 'linear_vel_x': 14.249170885972179, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017404424048349187
+step: 186, driver: 0, cmd: 20, 0. {'pose_x': -7.20519443141192, 'pose_y': -12.759340108429038, 'pose_theta': 4.1421595, 'linear_vel_x': 14.298018422826777, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016924084709148524
+step: 187, driver: 0, cmd: 20, 0. {'pose_x': -7.282378742860782, 'pose_y': -12.879697555843457, 'pose_theta': 4.1421595, 'linear_vel_x': 14.34669907768513, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017899273483285016
+step: 188, driver: 0, cmd: 20, 0. {'pose_x': -7.359825844768784, 'pose_y': -13.000464785871378, 'pose_theta': 4.1421595, 'linear_vel_x': 14.395214551260695, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01991596363335546
+step: 189, driver: 0, cmd: 20, 0. {'pose_x': -7.437534845445678, 'pose_y': -13.12164040805456, 'pose_theta': 4.1421595, 'linear_vel_x': 14.443566515555597, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01924582160863153
+step: 190, driver: 0, cmd: 20, 0. {'pose_x': -7.515504862227108, 'pose_y': -13.243223046009293, 'pose_theta': 4.1421595, 'linear_vel_x': 14.491756614534985, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016014507628589136
+step: 191, driver: 0, cmd: 20, 0. {'pose_x': -7.593735021323255, 'pose_y': -13.365211337190386, 'pose_theta': 4.1421595, 'linear_vel_x': 14.539786464781152, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017057939006783096
+step: 192, driver: 0, cmd: 20, 0. {'pose_x': -7.672224457671018, 'pose_y': -13.487603932660674, 'pose_theta': 4.1421595, 'linear_vel_x': 14.587657656128147, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019297596390808858
+step: 193, driver: 0, cmd: 20, 0. {'pose_x': -7.7509723147896255, 'pose_y': -13.610399496865847, 'pose_theta': 4.1421595, 'linear_vel_x': 14.635371752277614, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017271616302860116
+step: 194, driver: 0, cmd: 20, 0. {'pose_x': -7.8299777446395575, 'pose_y': -13.73359670741448, 'pose_theta': 4.1421595, 'linear_vel_x': 14.68293029139649, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01729419140768318
+step: 195, driver: 0, cmd: 20, 0. {'pose_x': -7.909239907484709, 'pose_y': -13.857194254863082, 'pose_theta': 4.1421595, 'linear_vel_x': 14.730334786697258, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017966649146888614
+step: 196, driver: 0, cmd: 20, 0. {'pose_x': -7.988757971757679, 'pose_y': -13.981190842506042, 'pose_theta': 4.1421595, 'linear_vel_x': 14.777586727001328, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019894793015626355
+step: 197, driver: 0, cmd: 20, 0. {'pose_x': -8.068531113928099, 'pose_y': -14.105585186170304, 'pose_theta': 4.1421595, 'linear_vel_x': 14.824687577286186, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.026110871721175766
+step: 198, driver: 0, cmd: 20, 0. {'pose_x': -8.148558518373918, 'pose_y': -14.23037601401466, 'pose_theta': 4.1421595, 'linear_vel_x': 14.871638779216838, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018369550825627412
+step: 199, driver: 0, cmd: 20, 0. {'pose_x': -8.228839377255557, 'pose_y': -14.355562066333505, 'pose_theta': 4.1421595, 'linear_vel_x': 14.918441751662128, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018205885227019714
+step: 200, driver: 0, cmd: 20, 0. {'pose_x': -8.30937289039285, 'pose_y': -14.481142095364952, 'pose_theta': 4.1421595, 'linear_vel_x': 14.965097891196436, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01649337918818594
+step: 201, driver: 0, cmd: 20, 0. {'pose_x': -8.390158265144693, 'pose_y': -14.607114865103151, 'pose_theta': 4.1421595, 'linear_vel_x': 15.011608572587265, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018454447084167214
+step: 202, driver: 0, cmd: 20, 0. {'pose_x': -8.47119471629132, 'pose_y': -14.733479151114736, 'pose_theta': 4.1421595, 'linear_vel_x': 15.057975149269197, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.026094248402575015
+step: 203, driver: 0, cmd: 20, 0. {'pose_x': -8.55248146591915, 'pose_y': -14.860233740359241, 'pose_theta': 4.1421595, 'linear_vel_x': 15.104198953804682, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.025730308418023373
+step: 204, driver: 0, cmd: 20, 0. {'pose_x': -8.634017743308108, 'pose_y': -14.987377431013408, 'pose_theta': 4.1421595, 'linear_vel_x': 15.150281298332107, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018139447962841615
+step: 205, driver: 0, cmd: 20, 0. {'pose_x': -8.715802784821374, 'pose_y': -15.114909032299256, 'pose_theta': 4.1421595, 'linear_vel_x': 15.196223475001569, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017435879235495166
+step: 206, driver: 0, cmd: 20, 0. {'pose_x': -8.797835833797482, 'pose_y': -15.24282736431583, 'pose_theta': 4.1421595, 'linear_vel_x': 15.241907389754303, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02066650943905124
+step: 207, driver: 0, cmd: 20, 0. {'pose_x': -8.880115496073433, 'pose_y': -15.37113025307341, 'pose_theta': 4.1421595, 'linear_vel_x': 15.28715685047774, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020741623533146125
+step: 208, driver: 0, cmd: 20, 0. {'pose_x': -8.962639426356747, 'pose_y': -15.499814041437391, 'pose_theta': 4.1421595, 'linear_vel_x': 15.331975988829695, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022125570112362047
+step: 209, driver: 0, cmd: 20, 0. {'pose_x': -9.045405301658672, 'pose_y': -15.628875107052515, 'pose_theta': 4.1421595, 'linear_vel_x': 15.376368897175926, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017306304734161948
+step: 210, driver: 0, cmd: 20, 0. {'pose_x': -9.128410821082081, 'pose_y': -15.758309862012123, 'pose_theta': 4.1421595, 'linear_vel_x': 15.420339628963783, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02016985112695746
+step: 211, driver: 0, cmd: 20, 0. {'pose_x': -9.211653705611381, 'pose_y': -15.88811475253055, 'pose_theta': 4.1421595, 'linear_vel_x': 15.463892199092337, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018260896080084965
+step: 212, driver: 0, cmd: 20, 0. {'pose_x': -9.295131697904413, 'pose_y': -16.01828625861863, 'pose_theta': 4.1421595, 'linear_vel_x': 15.507030584278969, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01646902375206105
+step: 213, driver: 0, cmd: 20, 0. {'pose_x': -9.378842562086346, 'pose_y': -16.1488208937623, 'pose_theta': 4.1421595, 'linear_vel_x': 15.549758723422476, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016795036323542845
+step: 214, driver: 0, cmd: 20, 0. {'pose_x': -9.462784083545515, 'pose_y': -16.279715204604233, 'pose_theta': 4.1421595, 'linear_vel_x': 15.592080517962728, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016782102504014906
+step: 215, driver: 0, cmd: 20, 0. {'pose_x': -9.546954068731212, 'pose_y': -16.410965770628547, 'pose_theta': 4.1421595, 'linear_vel_x': 15.633999832236903, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02206525272190829
+step: 216, driver: 0, cmd: 20, 0. {'pose_x': -9.6313503449534, 'pose_y': -16.542569203848455, 'pose_theta': 4.1421595, 'linear_vel_x': 15.67552049383233, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01874144435577707
+step: 217, driver: 0, cmd: 20, 0. {'pose_x': -9.715970760184323, 'pose_y': -16.674522148496923, 'pose_theta': 4.1421595, 'linear_vel_x': 15.716646293935986, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01917397465177495
+step: 218, driver: 0, cmd: 20, 0. {'pose_x': -9.800813182862006, 'pose_y': -16.80682128072027, 'pose_theta': 4.1421595, 'linear_vel_x': 15.757380987680655, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019389301278005533
+step: 219, driver: 0, cmd: 20, 0. {'pose_x': -9.88587550169563, 'pose_y': -16.939463308274657, 'pose_theta': 4.1421595, 'linear_vel_x': 15.797728294487811, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018857374767266233
+step: 220, driver: 0, cmd: 20, 0. {'pose_x': -9.971155625472752, 'pose_y': -17.072444970225487, 'pose_theta': 4.1421595, 'linear_vel_x': 15.837691898407233, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021834074227663702
+step: 221, driver: 0, cmd: 20, 0. {'pose_x': -10.05665148286836, 'pose_y': -17.20576303664965, 'pose_theta': 4.1421595, 'linear_vel_x': 15.87727544845338, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017078935935371575
+step: 222, driver: 0, cmd: 20, 0. {'pose_x': -10.142361022255743, 'pose_y': -17.3394143083406, 'pose_theta': 4.1421595, 'linear_vel_x': 15.916482558938588, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01892205137820413
+step: 223, driver: 0, cmd: 20, 0. {'pose_x': -10.228282211519158, 'pose_y': -17.473395616516257, 'pose_theta': 4.1421595, 'linear_vel_x': 15.955316809803081, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020537406929654445
+step: 224, driver: 0, cmd: 20, 0. {'pose_x': -10.314413037868285, 'pose_y': -17.607703822529647, 'pose_theta': 4.1421595, 'linear_vel_x': 15.993781746941854, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01897679180315537
+step: 225, driver: 0, cmd: 20, 0. {'pose_x': -10.400751507654437, 'pose_y': -17.742335817582333, 'pose_theta': 4.1421595, 'linear_vel_x': 16.031880882528437, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02014829886367764
+step: 226, driver: 0, cmd: 20, 0. {'pose_x': -10.48729564618853, 'pose_y': -17.87728852244055, 'pose_theta': 4.1421595, 'linear_vel_x': 16.06961769533559, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018058694336380743
+slowdown steps: 39
+step: 227, driver: 0, cmd: 0, 0. {'pose_x': -10.574043497560769, 'pose_y': -18.012558887154054, 'pose_theta': 4.1421595, 'linear_vel_x': 16.10699563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01932995912251656
+slowdown steps: 38
+step: 228, driver: 0, cmd: 0, 0. {'pose_x': -10.660993124462065, 'pose_y': -18.148143890777614, 'pose_theta': 4.1421595, 'linear_vel_x': 16.01189563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016754907797251306
+slowdown steps: 37
+step: 229, driver: 0, cmd: 0, 0. {'pose_x': -10.747429377565558, 'pose_y': -18.282928364361933, 'pose_theta': 4.1421595, 'linear_vel_x': 15.91679563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017251806953011872
+slowdown steps: 36
+step: 230, driver: 0, cmd: 0, 0. {'pose_x': -10.833352256871247, 'pose_y': -18.41691230790701, 'pose_theta': 4.1421595, 'linear_vel_x': 15.82169563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022164611410140145
+slowdown steps: 35
+step: 231, driver: 0, cmd: 0, 0. {'pose_x': -10.918761762379134, 'pose_y': -18.550095721412845, 'pose_theta': 4.1421595, 'linear_vel_x': 15.72659563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02280314971918118
+slowdown steps: 34
+step: 232, driver: 0, cmd: 0, 0. {'pose_x': -11.003657894089217, 'pose_y': -18.68247860487944, 'pose_theta': 4.1421595, 'linear_vel_x': 15.63149563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018341199847122347
+slowdown steps: 33
+step: 233, driver: 0, cmd: 0, 0. {'pose_x': -11.088040652001498, 'pose_y': -18.81406095830679, 'pose_theta': 4.1421595, 'linear_vel_x': 15.53639563105295, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.024524993566157338
+slowdown steps: 32
+step: 234, driver: 0, cmd: 0, 0. {'pose_x': -11.171910036115975, 'pose_y': -18.9448427816949, 'pose_theta': 4.1421595, 'linear_vel_x': 15.441295631052949, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017465722247208326
+slowdown steps: 31
+step: 235, driver: 0, cmd: 0, 0. {'pose_x': -11.255266046432649, 'pose_y': -19.074824075043765, 'pose_theta': 4.1421595, 'linear_vel_x': 15.346195631052948, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019682934230600857
+slowdown steps: 30
+step: 236, driver: 0, cmd: 0, 0. {'pose_x': -11.33810868295152, 'pose_y': -19.204004838353388, 'pose_theta': 4.1421595, 'linear_vel_x': 15.251095631052948, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01938808812484749
+slowdown steps: 29
+step: 237, driver: 0, cmd: 0, 0. {'pose_x': -11.420437945672587, 'pose_y': -19.33238507162377, 'pose_theta': 4.1421595, 'linear_vel_x': 15.155995631052948, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018483921297953287
+slowdown steps: 28
+step: 238, driver: 0, cmd: 0, 0. {'pose_x': -11.502253834595852, 'pose_y': -19.459964774854907, 'pose_theta': 4.1421595, 'linear_vel_x': 15.060895631052947, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01824976727911709
+slowdown steps: 27
+step: 239, driver: 0, cmd: 0, 0. {'pose_x': -11.583556349721313, 'pose_y': -19.586743948046806, 'pose_theta': 4.1421595, 'linear_vel_x': 14.965795631052947, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021663831993746108
+slowdown steps: 26
+step: 240, driver: 0, cmd: 0, 0. {'pose_x': -11.664345491048971, 'pose_y': -19.712722591199462, 'pose_theta': 4.1421595, 'linear_vel_x': 14.870695631052946, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018492895527513653
+slowdown steps: 25
+step: 241, driver: 0, cmd: 0, 0. {'pose_x': -11.744621258578826, 'pose_y': -19.837900704312876, 'pose_theta': 4.1421595, 'linear_vel_x': 14.775595631052946, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02099734767277761
+slowdown steps: 24
+step: 242, driver: 0, cmd: 0, 0. {'pose_x': -11.824383652310878, 'pose_y': -19.962278287387047, 'pose_theta': 4.1421595, 'linear_vel_x': 14.680495631052946, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01981411321795834
+slowdown steps: 23
+step: 243, driver: 0, cmd: 0, 0. {'pose_x': -11.903632672245127, 'pose_y': -20.085855340421976, 'pose_theta': 4.1421595, 'linear_vel_x': 14.585395631052945, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016490188194053346
+slowdown steps: 22
+step: 244, driver: 0, cmd: 0, 0. {'pose_x': -11.982368318381573, 'pose_y': -20.20863186341766, 'pose_theta': 4.1421595, 'linear_vel_x': 14.490295631052945, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.029866642531970022
+slowdown steps: 21
+step: 245, driver: 0, cmd: 0, 0. {'pose_x': -12.060590590720215, 'pose_y': -20.330607856374105, 'pose_theta': 4.1421595, 'linear_vel_x': 14.395195631052944, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.022649179486174287
+slowdown steps: 20
+step: 246, driver: 0, cmd: 0, 0. {'pose_x': -12.138299489261055, 'pose_y': -20.451783319291305, 'pose_theta': 4.1421595, 'linear_vel_x': 14.300095631052944, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01813419479573586
+slowdown steps: 19
+step: 247, driver: 0, cmd: 0, 0. {'pose_x': -12.215495014004091, 'pose_y': -20.572158252169267, 'pose_theta': 4.1421595, 'linear_vel_x': 14.204995631052943, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02120317541131289
+slowdown steps: 18
+step: 248, driver: 0, cmd: 0, 0. {'pose_x': -12.292177164949324, 'pose_y': -20.691732655007986, 'pose_theta': 4.1421595, 'linear_vel_x': 14.109895631052943, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01913307470582115
+slowdown steps: 17
+step: 249, driver: 0, cmd: 0, 0. {'pose_x': -12.368345942096754, 'pose_y': -20.810506527807462, 'pose_theta': 4.1421595, 'linear_vel_x': 14.014795631052943, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.024059828499285674
+slowdown steps: 16
+step: 250, driver: 0, cmd: 0, 0. {'pose_x': -12.44400134544638, 'pose_y': -20.928479870567696, 'pose_theta': 4.1421595, 'linear_vel_x': 13.919695631052942, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01624241834043172
+slowdown steps: 15
+step: 251, driver: 0, cmd: 0, 0. {'pose_x': -12.519143374998201, 'pose_y': -21.045652683288687, 'pose_theta': 4.1421595, 'linear_vel_x': 13.824595631052942, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017976598996988002
+slowdown steps: 14
+step: 252, driver: 0, cmd: 0, 0. {'pose_x': -12.59377203075222, 'pose_y': -21.162024965970435, 'pose_theta': 4.1421595, 'linear_vel_x': 13.729495631052941, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018451859727330433
+slowdown steps: 13
+step: 253, driver: 0, cmd: 0, 0. {'pose_x': -12.667887312708435, 'pose_y': -21.27759671861294, 'pose_theta': 4.1421595, 'linear_vel_x': 13.634395631052941, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019605702072337916
+slowdown steps: 12
+step: 254, driver: 0, cmd: 0, 0. {'pose_x': -12.741489220866848, 'pose_y': -21.392367941216204, 'pose_theta': 4.1421595, 'linear_vel_x': 13.53929563105294, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017046708712100678
+slowdown steps: 11
+step: 255, driver: 0, cmd: 0, 0. {'pose_x': -12.814577755227457, 'pose_y': -21.506338633780224, 'pose_theta': 4.1421595, 'linear_vel_x': 13.44419563105294, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02259554560079735
+slowdown steps: 10
+step: 256, driver: 0, cmd: 0, 0. {'pose_x': -12.887152915790264, 'pose_y': -21.619508796305006, 'pose_theta': 4.1421595, 'linear_vel_x': 13.34909563105294, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020688346355414833
+slowdown steps: 9
+step: 257, driver: 0, cmd: 0, 0. {'pose_x': -12.959214702555267, 'pose_y': -21.731878428790544, 'pose_theta': 4.1421595, 'linear_vel_x': 13.25399563105294, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02257036814970359
+slowdown steps: 8
+step: 258, driver: 0, cmd: 0, 0. {'pose_x': -13.030763115522467, 'pose_y': -21.84344753123684, 'pose_theta': 4.1421595, 'linear_vel_x': 13.158895631052939, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019465261375323006
+slowdown steps: 7
+step: 259, driver: 0, cmd: 0, 0. {'pose_x': -13.101798154691863, 'pose_y': -21.954216103643894, 'pose_theta': 4.1421595, 'linear_vel_x': 13.063795631052939, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.01679967130525717
+slowdown steps: 6
+step: 260, driver: 0, cmd: 0, 0. {'pose_x': -13.172319820063457, 'pose_y': -22.064184146011705, 'pose_theta': 4.1421595, 'linear_vel_x': 12.968695631052938, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.016777727298376566
+slowdown steps: 5
+step: 261, driver: 0, cmd: 0, 0. {'pose_x': -13.242328111637248, 'pose_y': -22.173351658340273, 'pose_theta': 4.1421595, 'linear_vel_x': 12.873595631052938, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.023775880678897465
+slowdown steps: 4
+step: 262, driver: 0, cmd: 0, 0. {'pose_x': -13.311823029413235, 'pose_y': -22.2817186406296, 'pose_theta': 4.1421595, 'linear_vel_x': 12.778495631052937, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.02580993375523688
+slowdown steps: 3
+step: 263, driver: 0, cmd: 0, 0. {'pose_x': -13.38080457339142, 'pose_y': -22.389285092879682, 'pose_theta': 4.1421595, 'linear_vel_x': 12.683395631052937, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017836162936738065
+slowdown steps: 2
+step: 264, driver: 0, cmd: 0, 0. {'pose_x': -13.4492727435718, 'pose_y': -22.496051015090526, 'pose_theta': 4.1421595, 'linear_vel_x': 12.588295631052937, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.021662331628492737
+slowdown steps: 1
+step: 265, driver: 0, cmd: 0, 0. {'pose_x': -13.517227539954378, 'pose_y': -22.602016407262127, 'pose_theta': 4.1421595, 'linear_vel_x': 12.493195631052936, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.018169807430680418
+slowdown steps: 0
+step: 266, driver: 0, cmd: 0, 0. {'pose_x': -13.584668962539153, 'pose_y': -22.707181269394486, 'pose_theta': 4.1421595, 'linear_vel_x': 12.398095631052936, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.017825814207021118
+step: 267, driver: 0, cmd: 12.0, -0.15104941364315963. {'pose_x': -13.651597011326125, 'pose_y': -22.8115456014876, 'pose_theta': 4.1421595, 'linear_vel_x': 12.302995631052935, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019614584231591792
+step: 268, driver: 0, cmd: 12.0, -0.1510494136431595. {'pose_x': -13.718011686315293, 'pose_y': -22.915109403541475, 'pose_theta': 4.1421595, 'linear_vel_x': 12.291469677247681, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.019735404366986842
+step: 269, driver: 0, cmd: 12.0, -0.15976862488146612. {'pose_x': -13.78436414129733, 'pose_y': -23.01857618275358, 'pose_theta': 4.1421595, 'linear_vel_x': 12.28038217072518, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+0.020321486336158823
+step: 270, driver: 0, cmd: 12.0, -0.1597686248814664. {'pose_x': -13.850656743121304, 'pose_y': -23.121949629872823, 'pose_theta': 4.1421595, 'linear_vel_x': 12.269716432950794, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0}
+1.7066303469726964
+step: 271, driver: 0, cmd: 12.0, -0.16874855734630673. {'pose_x': -13.91689176860135, 'pose_y': -23.22523329525201, 'pose_theta': 4.1421595, 'linear_vel_x': 12.259456419841346, 'linear_vel_y': 0.0, 'angular_vel_z': -0.10622492972108596}
+0.0173399943369259
+step: 272, driver: 0, cmd: 12.0, -0.17748133356852058. {'pose_x': -13.983142297860178, 'pose_y': -23.328385098648383, 'pose_theta': 4.1410972507027894, 'linear_vel_x': 12.249586697630582, 'linear_vel_y': 0.0, 'angular_vel_z': -0.30869471425482264}
+1.739292469662285
+step: 273, driver: 0, cmd: 12.0, -0.1761927415301783. {'pose_x': -14.04947811695009, 'pose_y': -23.43136469144204, 'pose_theta': 4.138010303560241, 'linear_vel_x': 12.240092419652715, 'linear_vel_y': 0.0, 'angular_vel_z': -0.5981436427454034}
+0.020495519558663022
+step: 274, driver: 0, cmd: 12.0, -0.18281559278473442. {'pose_x': -14.115970440594964, 'pose_y': -23.534130235961932, 'pose_theta': 4.132028867132787, 'linear_vel_x': 12.230959304009126, 'linear_vel_y': 0.0, 'angular_vel_z': -0.9659389530520247}
+1.7186194156712133
+step: 275, driver: 0, cmd: 12.0, -0.17923137442466333. {'pose_x': -14.182695960492655, 'pose_y': -23.636635560428594, 'pose_theta': 4.122369477602267, 'linear_vel_x': 12.22217361208462, 'linear_vel_y': 0.0, 'angular_vel_z': -1.4040160552829533}
+3.4824615369381338
+step: 276, driver: 0, cmd: 12.0, -0.1821175240034138. {'pose_x': -14.249740252360715, 'pose_y': -23.73882761348706, 'pose_theta': 4.108329317049438, 'linear_vel_x': 12.21372212788092, 'linear_vel_y': 0.0, 'angular_vel_z': -1.9048271655166007}
+0.018918764767296148
+step: 277, driver: 0, cmd: 12.0, -0.18198483382947725. {'pose_x': -14.317200568351943, 'pose_y': -23.840644147449243, 'pose_theta': 4.089281045394272, 'linear_vel_x': 12.20559213813633, 'linear_vel_y': 0.0, 'angular_vel_z': -2.2507557814496537}
+1.7948293813632183
+step: 278, driver: 0, cmd: 12.0, -0.17435580761209168. {'pose_x': -14.385049289351908, 'pose_y': -23.942104479613704, 'pose_theta': 4.066773487579775, 'linear_vel_x': 12.197771413201624, 'linear_vel_y': 0.0, 'angular_vel_z': -2.6651085107655916}
+1.7112706547210124
+step: 279, driver: 0, cmd: 12.0, -0.1696563927811916. {'pose_x': -14.453419892768336, 'pose_y': -24.043119445501663, 'pose_theta': 4.040122402472119, 'linear_vel_x': 12.190248188643434, 'linear_vel_y': 0.0, 'angular_vel_z': -2.930440227704976}
+3.5185350404138838
+step: 280, driver: 0, cmd: 12.0, -0.1611864033467281. {'pose_x': -14.522316092449007, 'pose_y': -24.14368548728334, 'pose_theta': 4.010818000195069, 'linear_vel_x': 12.183011147547438, 'linear_vel_y': 0.0, 'angular_vel_z': -3.269125450376434}
+3.6115823489102894
+step: 281, driver: 0, cmd: 12.0, -0.1520404423140943. {'pose_x': -14.591895546541993, 'pose_y': -24.24369186523119, 'pose_theta': 3.9781267456913048, 'linear_vel_x': 12.176049403494734, 'linear_vel_y': 0.0, 'angular_vel_z': -3.4639734032655642}
+1.8154542640578093
+step: 282, driver: 0, cmd: 12.0, -0.139769761888352. {'pose_x': -14.662182349669939, 'pose_y': -24.34311712969495, 'pose_theta': 3.943487011658649, 'linear_vel_x': 12.169352484185794, 'linear_vel_y': 0.0, 'angular_vel_z': -3.7365707936771724}
+3.6283706191622542
+step: 283, driver: 0, cmd: 12.0, -0.13021291994512693. {'pose_x': -14.73334785238033, 'pose_y': -24.441832808350437, 'pose_theta': 3.906121303721877, 'linear_vel_x': 12.162910315687366, 'linear_vel_y': 0.0, 'angular_vel_z': -3.8700191027425177}
+3.6571176687455544
+step: 284, driver: 0, cmd: 12.0, -0.1133901547151908. {'pose_x': -14.805427105496443, 'pose_y': -24.53980331414156, 'pose_theta': 3.8674211126944518, 'linear_vel_x': 12.156713207278619, 'linear_vel_y': 0.0, 'angular_vel_z': -4.085218178653798}
+5.565384490877429
+step: 285, driver: 0, cmd: 12.0, -0.10500931089984661. {'pose_x': -14.878595993175042, 'pose_y': -24.636885142906163, 'pose_theta': 3.826568930907914, 'linear_vel_x': 12.15075183687374, 'linear_vel_y': 0.0, 'angular_vel_z': -4.165569730897023}
+5.713343803496972
+step: 286, driver: 0, cmd: 12.0, -0.08374946240374481. {'pose_x': -14.952892454052565, 'pose_y': -24.733031452878016, 'pose_theta': 3.7849132335989437, 'linear_vel_x': 12.145017236999063, 'linear_vel_y': 0.0, 'angular_vel_z': -4.12295516844891}
+3.735769956970893
+step: 287, driver: 0, cmd: 12.0, -0.0780932615965025. {'pose_x': -15.028359521060144, 'pose_y': -24.828188513393638, 'pose_theta': 3.7436836819144546, 'linear_vel_x': 12.139500781303619, 'linear_vel_y': 0.0, 'angular_vel_z': -4.176815167332436}
+5.632716535512893
+step: 288, driver: 0, cmd: 12.0, -0.05359667325596671. {'pose_x': -15.10516719741851, 'pose_y': -24.922195581076636, 'pose_theta': 3.70191553024113, 'linear_vel_x': 12.134194171582829, 'linear_vel_y': 0.0, 'angular_vel_z': -4.110446475142144}
+5.8733591153476645
+step: 289, driver: 0, cmd: 12.0, -0.026413636916058435. {'pose_x': -15.183343339096856, 'pose_y': -25.014998370321653, 'pose_theta': 3.6608110654897086, 'linear_vel_x': 12.129089425295819, 'linear_vel_y': 0.0, 'angular_vel_z': -3.934950769726022}
+5.6892333614644475
+step: 290, driver: 0, cmd: 12.0, -0.024223396489075535. {'pose_x': -15.262913897069915, 'pose_y': -25.106540750302393, 'pose_theta': 3.6214615577924483, 'linear_vel_x': 12.124178863557566, 'linear_vel_y': 0.0, 'angular_vel_z': -3.660830853767904}
+5.629906949477592
+step: 291, driver: 0, cmd: 12.0, 0.0037295467760009395. {'pose_x': -15.343898146739107, 'pose_y': -25.19676892005592, 'pose_theta': 3.584853249254769, 'linear_vel_x': 12.119455099587835, 'linear_vel_y': 0.0, 'angular_vel_z': -3.505512729102215}
+5.752199890783727
+step: 292, driver: 0, cmd: 12.0, 0.001611584396742091. {'pose_x': -15.426425509686549, 'pose_y': -25.28552337659774, 'pose_theta': 3.549798121963747, 'linear_vel_x': 12.114911027599513, 'linear_vel_y': 0.0, 'angular_vel_z': -3.251834837564518}
+5.736650374138771
+step: 293, driver: 0, cmd: 12.0, 0.030322675116830317. {'pose_x': -15.510482840149132, 'pose_y': -25.372767127756028, 'pose_theta': 3.517279773588102, 'linear_vel_x': 12.110539812109627, 'linear_vel_y': 0.0, 'angular_vel_z': -2.909641098505425}
+5.739724514802157
+step: 294, driver: 0, cmd: 12.0, 0.05948604792441786. {'pose_x': -15.596049463321316, 'pose_y': -25.45846934740627, 'pose_theta': 3.4881833626030474, 'linear_vel_x': 12.106334877656977, 'linear_vel_y': 0.0, 'angular_vel_z': -2.488226016371674}
+5.8179036674696345
+step: 295, driver: 0, cmd: 12.0, 0.051278902151425096. {'pose_x': -15.68309434075291, 'pose_y': -25.542609253098615, 'pose_theta': 3.4633011024393308, 'linear_vel_x': 12.102289898910906, 'linear_vel_y': 0.0, 'angular_vel_z': -1.996348755972623}
+5.7963822215660254
+step: 296, driver: 0, cmd: 12.0, 0.07812939855606467. {'pose_x': -15.771574049986901, 'pose_y': -25.625179726838304, 'pose_theta': 3.4433376148796047, 'linear_vel_x': 12.098398791156335, 'linear_vel_y': 0.0, 'angular_vel_z': -1.6489993990313052}
+5.902563571870756
+step: 297, driver: 0, cmd: 12.0, 0.10460688360594352. {'pose_x': -15.86154123328009, 'pose_y': -25.706068732650436, 'pose_theta': 3.4268476208892915, 'linear_vel_x': 12.094655701140749, 'linear_vel_y': 0.0, 'angular_vel_z': -1.2282015209540307}
+5.995852777549803
+step: 298, driver: 0, cmd: 12.0, 0.0906181579688779. {'pose_x': -15.952915939503399, 'pose_y': -25.785307187427883, 'pose_theta': 3.4145656056797513, 'linear_vel_x': 12.091054998269355, 'linear_vel_y': 0.0, 'angular_vel_z': -0.7421395750697606}
+5.872489457411584
+step: 299, driver: 0, cmd: 12.0, 0.11432259988935152. {'pose_x': -16.04561111968625, 'pose_y': -25.862940715416673, 'pose_theta': 3.407144209929054, 'linear_vel_x': 12.087591266135188, 'linear_vel_y': 0.0, 'angular_vel_z': -0.40487408439956185}
+5.706419669665232
+switching to de! max_diff = 5.706419669665232, {'pose_x': -16.13963438978835, 'pose_y': -25.938905252807636, 'pose_theta': 3.4030954690850583, 'linear_vel_x': 12.084259294371405, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0016659178857611479}
+0.99
+step: 300, driver: 1, cmd: 9.553430969829542, 0.09890225757465275. {'pose_x': -16.13963438978835, 'pose_y': -25.938905252807636, 'pose_theta': 3.4030954690850583, 'linear_vel_x': 12.084259294371405, 'linear_vel_y': 0.0, 'angular_vel_z': 0.0016659178857611479}
+5.808882294932733
+resetting switched count to 999
+0.98
+step: 301, driver: 1, cmd: 9.506342798381004, 0.12172283623918227. {'pose_x': -16.234873305863218, 'pose_y': -26.013285903075325, 'pose_theta': 3.403112128263916, 'linear_vel_x': 11.989159294371404, 'linear_vel_y': 0.0, 'angular_vel_z': -0.5665526713987241}
+5.636096269450507
+resetting switched count to 998
+0.97
+step: 302, driver: 1, cmd: 9.463374803474718, 0.14697911287699342. {'pose_x': -16.330383394195923, 'pose_y': -26.085755324801042, 'pose_theta': 3.397446601549929, 'linear_vel_x': 11.89471295486393, 'linear_vel_y': 0.0, 'angular_vel_z': -1.1864611228832485}
+5.706660521942265
+resetting switched count to 997
+0.96
+step: 303, driver: 1, cmd: 9.402709033898866, 0.13680336696767967. {'pose_x': -16.42616069089197, 'pose_y': -26.156289919614213, 'pose_theta': 3.3855819903210964, 'linear_vel_x': 11.802224851585084, 'linear_vel_y': 0.0, 'angular_vel_z': -1.5645890840134522}
+3.744297850702127
+resetting switched count to 996
+0.95
+step: 304, driver: 1, cmd: 9.348215593198269, 0.166860740878555. {'pose_x': -16.522095040617398, 'pose_y': -26.22503474987436, 'pose_theta': 3.3699360994809617, 'linear_vel_x': 11.7109472698803, 'linear_vel_y': 0.0, 'angular_vel_z': -1.7497865069350684}
+3.6940751391713444
+resetting switched count to 995
+0.94
+step: 305, driver: 1, cmd: 9.288218515055062, 0.15881004676675525. {'pose_x': -16.61810140821102, 'pose_y': -26.29209745170831, 'pose_theta': 3.3524382344116113, 'linear_vel_x': 11.621068956899316, 'linear_vel_y': 0.0, 'angular_vel_z': -2.0530332978722483}
+3.6103807419294505
+resetting switched count to 994
+0.93
+step: 306, driver: 1, cmd: 9.216438002141079, 0.19101350112986437. {'pose_x': -16.714243284014863, 'pose_y': -26.35737887392796, 'pose_theta': 3.331907901432889, 'linear_vel_x': 11.532327326091561, 'linear_vel_y': 0.0, 'angular_vel_z': -2.183472615022005}
+3.5832744223058928
+resetting switched count to 993
+0.92
+step: 307, driver: 1, cmd: 9.138186619012542, 0.22371967325556996. {'pose_x': -16.810454076395835, 'pose_y': -26.420962997614907, 'pose_theta': 3.310073175282669, 'linear_vel_x': 11.444230896208484, 'linear_vel_y': 0.0, 'angular_vel_z': -2.1708378448567354}
+1.8098343307790437
+resetting switched count to 992
+0.91
+step: 308, driver: 1, cmd: 9.061131076835675, 0.21647760063813554. {'pose_x': -16.90667860251833, 'pose_y': -26.482913644529, 'pose_theta': 3.2883647968341014, 'linear_vel_x': 11.356508971903951, 'linear_vel_y': 0.0, 'angular_vel_z': -2.0353953770022337}
+1.796234505775118
+resetting switched count to 991
+0.9
+step: 309, driver: 1, cmd: 8.978690937931047, 0.24842761197921437. {'pose_x': -17.002868358658812, 'pose_y': -26.54328383929867, 'pose_theta': 3.2680108430640793, 'linear_vel_x': 11.269192796775554, 'linear_vel_y': 0.0, 'angular_vel_z': -2.0705339372947718}
+0.01971535910308675
+0.89
+step: 310, driver: 1, cmd: 8.896557994867406, 0.23999622161441347. {'pose_x': -17.099095159599216, 'pose_y': -26.60193427331126, 'pose_theta': 3.2473055036911314, 'linear_vel_x': 11.182062106065109, 'linear_vel_y': 0.0, 'angular_vel_z': -1.9745002534128877}
+0.021331466171172542
+0.88
+step: 311, driver: 1, cmd: 8.807595722397705, 0.27148518152304224. {'pose_x': -17.195299794882366, 'pose_y': -26.6589300577556, 'pose_theta': 3.2275605011570025, 'linear_vel_x': 11.095121529675149, 'linear_vel_y': 0.0, 'angular_vel_z': -1.7618230899754541}
+0.023520108012135665
+0.87
+step: 312, driver: 1, cmd: 8.713425048095424, 0.2614790764311107. {'pose_x': -17.291429704600844, 'pose_y': -26.71433053278374, 'pose_theta': 3.209942270257248, 'linear_vel_x': 11.008104047966315, 'linear_vel_y': 0.0, 'angular_vel_z': -1.726741720285607}
+0.019590962419421043
+0.86
+step: 313, driver: 1, cmd: 8.621429608076715, 0.2918575669510021. {'pose_x': -17.387540196149775, 'pose_y': -26.768001836916472, 'pose_theta': 3.192674853054392, 'linear_vel_x': 10.920814458811225, 'linear_vel_y': 0.0, 'angular_vel_z': -1.565290155420504}
+0.01826555502113969
+0.85
+step: 314, driver: 1, cmd: 8.558007883901853, 0.28106791023166566. {'pose_x': -17.483562273739913, 'pose_y': -26.820022789038205, 'pose_theta': 3.177021951500187, 'linear_vel_x': 10.833345859089285, 'linear_vel_y': 0.0, 'angular_vel_z': -1.2895179051569958}
+0.018002784786688597
+0.84
+step: 315, driver: 1, cmd: 8.459846428767882, 0.30985856343720036. {'pose_x': -17.579433473714833, 'pose_y': -26.87046930790357, 'pose_theta': 3.164126772448617, 'linear_vel_x': 10.746792002513155, 'linear_vel_y': 0.0, 'angular_vel_z': -0.8975610675480327}
+0.016160156023161676
+0.83
+step: 316, driver: 1, cmd: 8.372130474144386, 0.33685007242351156. {'pose_x': -17.675105389849627, 'pose_y': -26.919420694989384, 'pose_theta': 3.1551511617731367, 'linear_vel_x': 10.659796592887885, 'linear_vel_y': 0.0, 'angular_vel_z': -0.6917526421026956}
+0.02208004834008115
+0.82
+step: 317, driver: 1, cmd: 8.282291262442614, 0.3244462282396511. {'pose_x': -17.770612855906386, 'pose_y': -26.966764652022903, 'pose_theta': 3.14823363535211, 'linear_vel_x': 10.572773773730882, 'linear_vel_y': 0.0, 'angular_vel_z': -0.3571667220231325}
+0.017818023504201363
+0.81
+step: 318, driver: 1, cmd: 8.149797196413742, 0.3115844380060378. {'pose_x': -17.86588121747957, 'pose_y': -27.012615429663093, 'pose_theta': 3.1446619681318784, 'linear_vel_x': 10.485643819001476, 'linear_vel_y': 0.0, 'angular_vel_z': -0.18683415746573714}
+0.017435851420314563
+0.8
+step: 319, driver: 1, cmd: 8.062108656403556, 0.3369557226717388. {'pose_x': -17.9609322479875, 'pose_y': -27.05688928458083, 'pose_theta': 3.142793626557221, 'linear_vel_x': 10.396788213478239, 'linear_vel_y': 0.0, 'angular_vel_z': 0.11087232966716545}
+0.01775224041812573
+0.79
+step: 320, driver: 1, cmd: 7.916207517081185, 0.32416656986435993. {'pose_x': -18.055664907980493, 'pose_y': -27.099726694005824, 'pose_theta': 3.1439023498538927, 'linear_vel_x': 10.307977003127117, 'linear_vel_y': 0.0, 'angular_vel_z': 0.5414964097502154}
+0.018165991126720016
+0.78
+step: 321, driver: 1, cmd: 7.839338182317467, 0.34753495582982774. {'pose_x': -18.150003089654636, 'pose_y': -27.141268798768536, 'pose_theta': 3.149317313951395, 'linear_vel_x': 10.21699409187793, 'linear_vel_y': 0.0, 'angular_vel_z': 1.0766847104331276}
+0.019783954641431123
+0.77
+step: 322, driver: 1, cmd: 7.767496166092622, 0.334256892861052. {'pose_x': -18.243849341824724, 'pose_y': -27.181661592444826, 'pose_theta': 3.1600841610557264, 'linear_vel_x': 10.126548061078251, 'linear_vel_y': 0.0, 'angular_vel_z': 1.4501553739391646}
+0.020353987498145543
+0.76
+step: 323, driver: 1, cmd: 7.6174469375952505, 0.3551739357606112. {'pose_x': -18.337222402693428, 'pose_y': -27.220855585190428, 'pose_theta': 3.174585714795118, 'linear_vel_x': 10.036809726992997, 'linear_vel_y': 0.0, 'angular_vel_z': 1.9767620296805073}
+0.01747500930133261
+0.75
+step: 324, driver: 1, cmd: 7.568408981796002, 0.34198272120485845. {'pose_x': -18.430043111533326, 'pose_y': -27.25904028055447, 'pose_theta': 3.194353335091923, 'linear_vel_x': 9.944777166484307, 'linear_vel_y': 0.0, 'angular_vel_z': 2.339521073604759}
+0.01752008253555365
+0.74
+step: 325, driver: 1, cmd: 7.4290496172270695, 0.36021953278016866. {'pose_x': -18.522286972838717, 'pose_y': -27.296201138194927, 'pose_theta': 3.2177485458279707, 'linear_vel_x': 9.854380120738764, 'linear_vel_y': 0.0, 'angular_vel_z': 2.8778713048883175}
+0.016851739431135326
+0.73
+step: 326, driver: 1, cmd: 7.294164590447292, 0.3472947439396007. {'pose_x': -18.613876737814078, 'pose_y': -27.33256314732753, 'pose_theta': 3.2465272588768537, 'linear_vel_x': 9.762120548385179, 'linear_vel_y': 0.0, 'angular_vel_z': 3.2714742406207926}
+0.018079292835240512
+0.72
+step: 327, driver: 1, cmd: 7.155745319677855, 0.3352835907063868. {'pose_x': -18.70478384219432, 'pose_y': -27.36814120423513, 'pose_theta': 3.2792420012830616, 'linear_vel_x': 9.668239503745221, 'linear_vel_y': 0.0, 'angular_vel_z': 3.8378048933510795}
+got 'exit' or None: {'type': 'exit'}
