@@ -1,5 +1,5 @@
 Running in Docker using container name sk_id2_container and image name sk_image.
-Sending build context to Docker daemon  42.53MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> a90c7d0c43f3
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 2c84e40a2adc
+ ---> 4a71514bc0d5
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> 95bb9561344a
+ ---> Running in eb3bd2ec7c50
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container eb3bd2ec7c50
+ ---> f386540aa268
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> f981ae308613
+ ---> Running in c124f5ad4cf0
+Removing intermediate container c124f5ad4cf0
+ ---> 70f1c1102a9b
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> 427355fdc337
-Successfully built 427355fdc337
+ ---> Running in fefc3fcd9389
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container fefc3fcd9389
+ ---> 43c5f3606870
+Successfully built 43c5f3606870
 Successfully tagged sk_image:latest
 running Driver import line: from pkg.drivers import DisparityExtender as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}

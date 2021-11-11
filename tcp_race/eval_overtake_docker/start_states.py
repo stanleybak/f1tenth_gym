@@ -106,7 +106,7 @@ def compute_opp_start_states(env, racetrack, poses, opp_driver_orig, num_overtak
     scanner = MyScanSimulator2D(map_path, yaml_path)
 
     obs, step_reward, done, info = env.reset(poses=poses)
-    env.render(mode='human_fast')
+    #env.render(mode='human_fast')
 
     driver = deepcopy(opp_driver_orig)
 
@@ -133,7 +133,7 @@ def compute_opp_start_states(env, racetrack, poses, opp_driver_orig, num_overtak
         actions[0, 1] = speed
 
         obs, step_reward, done, info = env.step(actions)
-        env.render(mode='human_fast')
+        #env.render(mode='human_fast')
 
         assert not obs['collisions'][0], "vehicle crashed in single-car race"
         assert not done, "vehicle finished race without sensing opponent"
@@ -141,6 +141,7 @@ def compute_opp_start_states(env, racetrack, poses, opp_driver_orig, num_overtak
         current_frame += 1
 
         if current_frame % frames_per_sample == 0:
+            print(".", end='', flush=True)
             # try to sense the opponent car
             x = odom['pose_x']
             y = odom['pose_y']
@@ -164,6 +165,7 @@ def compute_opp_start_states(env, racetrack, poses, opp_driver_orig, num_overtak
             tup = (deepcopy(env.sim.agents[0]), deepcopy(driver))
             samples.append(tup)
 
+    print()
     assert len(samples) >= num_overtake_scenarios, f"sensed opponent too early (recorded {len(samples)} samples)"
 
     diff = time.perf_counter() - start

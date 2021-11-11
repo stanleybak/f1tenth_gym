@@ -14,3 +14,12 @@ def pack_odom(obs, i):
         'ang_vels_z': 'angular_vel_z',
     }
     return {single: obs[multi][i] for multi, single in keys.items()}
+
+def get_pose(obs, i):
+    """extra pose from observation"""
+
+    x = obs['poses_x'][i]
+    y = obs['poses_y'][i]
+    theta = obs['poses_theta'][i]
+
+    return x, y, theta

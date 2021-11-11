@@ -1,5 +1,5 @@
 Running in Docker using container name fmuntenth_id3_container and image name fmuntenth_image.
-Sending build context to Docker daemon  42.53MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> 57e55809365c
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 81f7525857ee
+ ---> ff5db7a35a9e
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> fe20fa67b630
+ ---> Running in fd27aa00104d
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container fd27aa00104d
+ ---> 67666d08cc56
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> 0b3d24c4dbda
+ ---> Running in ebd9a0ed212b
+Removing intermediate container ebd9a0ed212b
+ ---> ca67cac9661c
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> 9c354425575d
-Successfully built 9c354425575d
+ ---> Running in 3149068f0384
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container 3149068f0384
+ ---> ae36452fddfa
+Successfully built ae36452fddfa
 Successfully tagged fmuntenth_image:latest
 running Driver import line: from pkg.drivers import GapFollower as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}

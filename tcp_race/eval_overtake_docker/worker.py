@@ -15,17 +15,7 @@ import gym
 from my_laser_models import MyScanSimulator2D
 
 from networking import send_object, recv_object
-from gap_driver import GapFollower
-from util import pack_odom
-
-def get_pose(obs, i):
-    """extra pose from observation"""
-
-    x = obs['poses_x'][i]
-    y = obs['poses_y'][i]
-    theta = obs['poses_theta'][i]
-
-    return x, y, theta
+from util import pack_odom, get_pose
 
 def worker_func(param):
     """parallel working
@@ -74,6 +64,9 @@ def worker_func(param):
     start_frame = 0
     frame = 0
 
+    replay_list = []
+    cur_replay = []
+
     while True:
         frame += 1
         
@@ -93,6 +86,7 @@ def worker_func(param):
                 last_detected_in_back = False
                 env.sim.agents[1] = deepcopy(opp_start_tuples[opp_index][0])
                 state = "racing"
+                cur_replay = []
 
         # run controllers
         for i in range(num_agents):            
@@ -115,6 +109,10 @@ def worker_func(param):
 
                 actions[i, 0] = obj['steer']
                 actions[i, 1] = obj['speed']
+
+                if state == 'racing':
+                    cur_replay.append(get_pose(obs, 0))
+                
             elif i == 1 and state == "racing":
                 if hasattr(opp_driver, 'process_observation'):
                     speed, steer = opp_driver.process_observation(ranges=scan, ego_odom=odom)
@@ -162,15 +160,17 @@ def worker_func(param):
 
         if result is not None:
             opp_index += 1
+            replay_list.append(cur_replay)
 
             if isinstance(result, int):
-                print(f"{driver_name} Result: Overtake ({result / 100}). {opp_index}/{len(opp_start_tuples)}")
+                print(f"{driver_name} Result: Overtake ({result / 100}s). {opp_index}/{len(opp_start_tuples)}")
             else:
                 print(f"{driver_name} Result: {result}. {opp_index}/{len(opp_start_tuples)}")
                 
             results.append(result)
 
             if opp_index >= len(opp_start_tuples):
+                print(f"{driver_name} Done!")
                 break
             
             # reset with next opponent
@@ -189,4 +189,4 @@ def worker_func(param):
 
     runtime = time.perf_counter() - start
             
-    return {'name': driver_name, 'results': results, 'runtime': runtime}
+    return {'name': driver_name, 'results': results, 'replay_list': replay_list, 'runtime': runtime}

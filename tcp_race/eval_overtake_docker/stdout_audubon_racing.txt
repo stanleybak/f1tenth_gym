@@ -1,5 +1,5 @@
 Running in Docker using container name audubon_racing_id10_container and image name audubon_racing_image.
-Sending build context to Docker daemon  42.54MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,60 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> 992a3b93e568
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> d865cb51700c
+ ---> 9a273e024bc6
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> e4f572641a0d
+ ---> Running in 7548f28a6e5e
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container 7548f28a6e5e
+ ---> dd074e166ba8
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> 383dbf5ffee1
+ ---> Running in 42eed09ddae9
+Removing intermediate container 42eed09ddae9
+ ---> c25fdc6c3199
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> d896f58ae1a3
-Successfully built d896f58ae1a3
+ ---> Running in 231b0195135f
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container 231b0195135f
+ ---> bf4109b7eae3
+Successfully built bf4109b7eae3
 Successfully tagged audubon_racing_image:latest
 running Driver import line: from pkg.vfh_gym import VFH as Driver
-Connecting to port 45009...
+Connecting to port 38163...
+Traceback (most recent call last):
+  File "/race/riders_client_tcp_race.py", line 92, in start_client
+    speed, steer = driver.process_observation(ranges=scan, ego_odom=odom)
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 270, in process_observation
+    self.pad_sectors()
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 338, in pad_sectors
+    alpha = sec.get_theta_pad_radius()
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 158, in get_theta_pad_radius
+    return math.asin(R_car/self.max_dis_to_go)
+ValueError: math domain error
+Traceback (most recent call last):
+  File "/race/riders_client_tcp_race.py", line 92, in start_client
+    speed, steer = driver.process_observation(ranges=scan, ego_odom=odom)
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 270, in process_observation
+    self.pad_sectors()
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 338, in pad_sectors
+    alpha = sec.get_theta_pad_radius()
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 158, in get_theta_pad_radius
+    return math.asin(R_car/self.max_dis_to_go)
+ValueError: math domain error
+Traceback (most recent call last):
+  File "/race/riders_client_tcp_race.py", line 92, in start_client
+    speed, steer = driver.process_observation(ranges=scan, ego_odom=odom)
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 270, in process_observation
+    self.pad_sectors()
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 338, in pad_sectors
+    alpha = sec.get_theta_pad_radius()
+  File "/race/files/pkg/src/pkg/vfh_gym.py", line 158, in get_theta_pad_radius
+    return math.asin(R_car/self.max_dis_to_go)
+ValueError: math domain error
+Error running driver code: math domain error
+Error running driver code: math domain error
+Error running driver code: math domain error
 got 'exit' or None: {'type': 'exit'}

@@ -1,5 +1,7 @@
 Running in Docker using container name paulius_stankaitis_id13_container and image name paulius_stankaitis_image.
-Sending build context to Docker daemon  42.54MB
+time="2021-11-09T22:19:29-05:00" level=error msg="Can't add file /home/stan/repositories/race/f1tenth_gym_stanleybak/tcp_race/eval_overtake_docker/stdout_gerhard_didier.txt to tar: archive/tar: write too long"
+time="2021-11-09T22:19:29-05:00" level=error msg="Can't add file /home/stan/repositories/race/f1tenth_gym_stanleybak/tcp_race/eval_overtake_docker/stdout_ucf.txt to tar: archive/tar: write too long"
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +29,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> 7d0973942df0
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> bec623763fd9
+ ---> 904b808ea8d9
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> 4d338e4836d2
+ ---> Running in 880b81ccf192
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container 880b81ccf192
+ ---> ca81b1cae2a5
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> f31efe7b2420
+ ---> Running in ec0e3ecd17ea
+Removing intermediate container ec0e3ecd17ea
+ ---> d6c4881aa593
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> ebce03f50e23
-Successfully built ebce03f50e23
+ ---> Running in 3b28b7126c7b
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container 3b28b7126c7b
+ ---> fc5d1ad98ba7
+Successfully built fc5d1ad98ba7
 Successfully tagged paulius_stankaitis_image:latest
 running Driver import line: from pkg.drivers import VaNNewDrive as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}

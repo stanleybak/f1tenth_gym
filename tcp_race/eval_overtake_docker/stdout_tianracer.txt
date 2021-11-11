@@ -1,5 +1,5 @@
 Running in Docker using container name tianracer_id15_container and image name tianracer_image.
-Sending build context to Docker daemon  42.54MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> 1b94f9e1acbf
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 4720b9612d98
+ ---> ae8e0d4fb06f
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> f51e19a1af60
+ ---> Running in ba5ee9ed1e8c
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container ba5ee9ed1e8c
+ ---> 4e21466d69dd
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> 487c4c2c42f2
+ ---> Running in c165d3e261e9
+Removing intermediate container c165d3e261e9
+ ---> 4de77fb019af
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> 990537e787b1
-Successfully built 990537e787b1
+ ---> Running in b94cd1890a1c
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container b94cd1890a1c
+ ---> 1acdc0cc2d21
+Successfully built 1acdc0cc2d21
 Successfully tagged tianracer_image:latest
 running Driver import line: from pkg.drivers import GapFollower as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}

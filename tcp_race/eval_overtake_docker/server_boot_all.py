@@ -9,6 +9,7 @@ import socket
 import os
 import subprocess
 import multiprocessing
+import pickle
 
 import pyglet
 
@@ -18,63 +19,7 @@ from gap_driver import Driver
 from networking import send_object, recv_object
 from worker import worker_func
 from start_states import get_opp_start_states
-
-class Renderer:
-    """custom renderer"""
-
-    def __init__(self, agent_names):
-
-        self.agent_names = agent_names
-        self.labels = []
-        self.positions = []
-
-    def callback(self, env_renderer):
-        'custom extra drawing function'
-
-        e = env_renderer
-
-        # update camera to follow car
-        x = e.cars[0].vertices[::2]
-        y = e.cars[0].vertices[1::2]
-
-        # hmm? looks like it was for multiple cars at some point
-        top, bottom, left, right = max(y), min(y), min(x), max(x)
-
-        #e.left = left - 800
-        #e.right = right + 800
-        #e.top = top + 800
-        #e.bottom = bottom - 800
-
-        z = env_renderer.zoom_level
-
-        (width, height) = env_renderer.get_size()
-        e.left = left - z * width/2
-        e.right = right + z * width/2
-        e.bottom = bottom - z * height/2
-        e.top = top + z * height/2
-
-        # update name labels
-        if self.positions:
-
-            # need to delete and re-create to draw moving text correctly
-            while self.labels:
-                self.labels[-1].delete()
-                del self.labels[-1]
-            
-            for i, (name, (x, y)) in enumerate(zip(self.agent_names, self.positions)):
-
-                r, g, b = e.rgbs[i % len(e.rgbs)]
-                
-                l = pyglet.text.Label(f'{name}',
-                        font_size=22,
-                        x=50 * x,
-                        y=50 * y - 40,
-                        anchor_x='center',
-                        anchor_y='center',
-                        color=(r, g, b, 255),
-                        batch=e.batch)
-
-                self.labels.append(l)
+from replay_results import replay_results
 
 def connect_docker(name_tarfiles):
     """start docker containers and connect to them with a tcp port"""
@@ -131,49 +76,67 @@ def connect_docker(name_tarfiles):
 
 def start_server(name_tarfiles):
     """start server"""
-    
+
     racetrack = 'SOCHI'
-    start_poses = [[0.8007017, -0.2753365, 4.1421595], [0.8162458, 1.1614572, 4.1446321]]    
+    start_poses = [[0.8007017, -0.2753365, 4.1421595], [0.8162458, 1.1614572, 4.1446321]]
+    gap_gain = 8
+    pickled_filename = f"gain{gap_gain}_results.pkl"
 
     #### make / load opponent start states
 
     #opp_start_states7: List[Tuple[RaceCar, Driver]] = get_opp_start_states(racetrack, start_poses,
     #                                                    gain=7, num_overtake_scenarios=10)
     opp_start_states: List[Tuple[RaceCar, Driver]] = get_opp_start_states(racetrack, start_poses,
-                                                        gain=8, num_overtake_scenarios=10)
+                                                        gain=gap_gain, num_overtake_scenarios=10)
 
-    print("!! development: only using first two opp positions")
-    opp_start_states = opp_start_states[:1]
+    #print("!! development: only using first few opp positions")
+    #opp_start_states = opp_start_states[:1]
+    
+    try:
+        with open(pickled_filename, 'rb') as f:
+            race_results = pickle.load(f)
 
-    docker_processes, sockets = connect_docker(name_tarfiles)
+        print(f"Loaded race results from {pickled_filename}")
+    except FileNotFoundError:
+        race_results = None
 
-    ###############
-    print("Starting parallel simulators...")
-    #num_agents = len(name_tarfiles)
-    #pool = multiprocessing.Pool(num_agents)
-    pool = multiprocessing.Pool(os.cpu_count() // 2)
+    if race_results is None:
+        docker_processes, sockets = connect_docker(name_tarfiles)
 
-    pool_params = []
+        ###############
+        print("Starting parallel simulators...")
+        pool = multiprocessing.Pool(len(name_tarfiles)) # one process per agent
+        #pool = multiprocessing.Pool(os.cpu_count() // 2)
 
-    for i, sock in enumerate(sockets):
-        driver_name = name_tarfiles[i][0]
-        tup = (racetrack, start_poses, sock, driver_name, opp_start_states)
-        pool_params.append(tup)
+        pool_params = []
 
-    race_results = pool.map(worker_func, pool_params)
+        for i, sock in enumerate(sockets):
+            driver_name = name_tarfiles[i][0]
+            tup = (racetrack, start_poses, sock, driver_name, opp_start_states)
+            pool_params.append(tup)
 
-    print("Sending exit command to all docker subprocesses...")
+        race_results = pool.map(worker_func, pool_params)
 
-    for sock in sockets:
-        send_object(sock, {"type": "exit"})
+        print("Sending exit command to all docker subprocesses...")
+
+        for sock in sockets:
+            send_object(sock, {"type": "exit"})
+
+        print(f"Saving pickled results to {pickled_filename}")
+        
+        with open(pickled_filename, 'wb') as f:
+            pickle.dump(race_results, f)
+
+        ############
+        print("Waiting for docker subprocesses to exit...")
+
+        for p in docker_processes:
+            p.wait()
 
     print_results(race_results)
 
-    ############
-    print("Waiting for docker subprocesses to exit...")
-                      
-    for p in docker_processes:
-        p.wait()
+    print("replaying results..")
+    replay_results(race_results, racetrack, start_poses, opp_start_states)
 
 def print_results(race_results):
     """print out results"""
@@ -201,16 +164,23 @@ def print_results(race_results):
         else:
             avg_overtake_time = f"{round(overtake_frames / num_overtakes / 100, 2)}s"
 
-        runtime = f"{round(rr['runtime'], 1)}s"
+        secs = rr['runtime']
 
-        tup = num_overtakes, avg_overtake_time, num_timeouts, num_crashes, runtime, rr['name']
+        if secs < 60:
+            runtime = f"{round(secs, 1)}s"
+        else:
+            runtime = f"{round(secs / 60, 2)}m"
+
+        # use neg avg_overtake time for better sorted results (descending)
+        tup = num_overtakes, -overtake_frames, avg_overtake_time, num_timeouts, num_crashes, runtime, rr['name']
         sorted_race_results.append(tup)
 
     sorted_race_results.sort(reverse=True)
 
-    for num_overtakes, avg_overtake_time, num_timeouts, num_crashes, runtime, name in sorted_race_results:
-        print(f"Driver: {name}, C:{num_crashes}, TO:{num_timeouts}, OV:{num_overtakes}, " + \
-              f"OV_SEC:{avg_overtake_time}, Runtime: {runtime}")
+    for num_overtakes, _neg_frames, avg_overtake_time, num_timeouts, num_crashes, runtime, name in sorted_race_results:
+        
+        print(f"Driver: {name}, OV:{num_overtakes}, " + \
+              f"OV_SEC:{avg_overtake_time}, C:{num_crashes}, TO:{num_timeouts}, Runtime: {runtime}")
 
 def start_docker(index, name, tarfile, port):
     """start docker for a car"""

@@ -1,5 +1,5 @@
 Running in Docker using container name gerhard_didier_id12_container and image name gerhard_didier_image.
-Sending build context to Docker daemon  42.54MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> 70f775b6ff78
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 96a61a29fcd3
+ ---> f6e9ef4e3096
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> 79748bb5dffa
+ ---> Running in 8dc467db495b
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container 8dc467db495b
+ ---> 8434f732f2ab
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> 7574afb385e7
+ ---> Running in e64f611fcd6a
+Removing intermediate container e64f611fcd6a
+ ---> a43f927da3e7
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> ed7b72eacc7a
-Successfully built ed7b72eacc7a
+ ---> Running in 9ff8ead034b4
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container 9ff8ead034b4
+ ---> 9805de4f73e2
+Successfully built 9805de4f73e2
 Successfully tagged gerhard_didier_image:latest
 running Driver import line: from pkg.drivers import DisparityExtenderSpeedControl as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}

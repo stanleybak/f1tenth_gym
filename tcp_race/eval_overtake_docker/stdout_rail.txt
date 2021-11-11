@@ -1,5 +1,5 @@
 Running in Docker using container name rail_id5_container and image name rail_image.
-Sending build context to Docker daemon  42.54MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> a284686ccbab
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 3421ea37748f
+ ---> f600b6af0fa9
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> 59e1558cb51a
+ ---> Running in 58abbd803560
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container 58abbd803560
+ ---> 5ac37b769973
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> ff8238f43b8e
+ ---> Running in 5136177c3ae1
+Removing intermediate container 5136177c3ae1
+ ---> 7c753a808198
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> 6873da5a946b
-Successfully built 6873da5a946b
+ ---> Running in 9b527a24d2b9
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container 9b527a24d2b9
+ ---> 3cf744e1d3e7
+Successfully built 3cf744e1d3e7
 Successfully tagged rail_image:latest
 running Driver import line: from pkg.drivers import RAIL_AV as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}

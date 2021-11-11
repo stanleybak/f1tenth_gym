@@ -1,5 +1,5 @@
 Running in Docker using container name ucf_id9_container and image name ucf_image.
-Sending build context to Docker daemon  42.54MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,23 +27,57 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> 54f0b8cb578d
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 73b09817f477
+ ---> 19b647753462
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> 61e6ac14ab5a
+ ---> Running in e89c880f761d
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container e89c880f761d
+ ---> 88aa3e46e0b6
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> fd22b5253817
+ ---> Running in ae92c5d5695e
+Removing intermediate container ae92c5d5695e
+ ---> 6a834f5cf914
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> d1cb9b87ad38
-Successfully built d1cb9b87ad38
+ ---> Running in 7c4241995b6e
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Collecting numba
+  Downloading numba-0.54.1-cp38-cp38-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.3 MB)
+Requirement already satisfied: numpy<1.21,>=1.17 in /usr/lib/python3/dist-packages (from numba->-r requirements.txt (line 3)) (1.17.4)
+Requirement already satisfied: setuptools in /usr/lib/python3/dist-packages (from numba->-r requirements.txt (line 3)) (45.2.0)
+Collecting llvmlite<0.38,>=0.37.0rc1
+  Downloading llvmlite-0.37.0-cp38-cp38-manylinux2014_x86_64.whl (26.3 MB)
+Installing collected packages: Pillow, llvmlite, numba
+Successfully installed Pillow-8.3.2 llvmlite-0.37.0 numba-0.54.1
+Removing intermediate container 7c4241995b6e
+ ---> 22176b038135
+Successfully built 22176b038135
 Successfully tagged ucf_image:latest
 running Driver import line: from pkg.disparity_extender_combined import DisparityExtenderDriving as Driver
 wall manager init
-Connecting to port 45009...
-OBSTACLE
-got 'exit' or None: {'type': 'exit'}
+Connecting to port 38163...
 /race/files/pkg/src/pkg/opp_car_detector.py:101: YAMLLoadWarning: calling yaml.load() without Loader=... is deprecated, as the default Loader is unsafe. Please read https://msg.pyyaml.org/load for full details.
   input_file = yaml.load(stream)
+/race/files/pkg/src/pkg/opp_car_detector.py:101: YAMLLoadWarning: calling yaml.load() without Loader=... is deprecated, as the default Loader is unsafe. Please read https://msg.pyyaml.org/load for full details.
+  input_file = yaml.load(stream)
+OBSTACLE
+wall manager init
+OBSTACLE
+wall manager init
+no obs track
+wall manager init
+no obs track
+wall manager init
+no obs track
+wall manager init
+no obs track
+wall manager init
+no obs track
+wall manager init
+no obs track
+wall manager init
+no obs track
+wall manager init
+no obs track
+got 'exit' or None: {'type': 'exit'}

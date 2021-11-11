@@ -5,6 +5,7 @@ riders client code in docker
 import sys
 import socket
 import os
+import traceback
 
 import numpy as np
 
@@ -86,11 +87,17 @@ def start_client(server_port, driver_index, name):
 
             start = time.perf_counter()
 
-            if hasattr(driver, 'process_observation'):
-                speed, steer = driver.process_observation(ranges=scan, ego_odom=odom)
-            else:
-                assert hasattr(driver, 'process_lidar')
-                speed, steer = driver.process_lidar(scan)
+            try:
+                if hasattr(driver, 'process_observation'):
+                    speed, steer = driver.process_observation(ranges=scan, ego_odom=odom)
+                else:
+                    assert hasattr(driver, 'process_lidar')
+                    speed, steer = driver.process_lidar(scan)
+            except Exception as e:
+                print(f"Error running driver code: {e}")
+                traceback.print_exc()
+                
+                speed, steer = 0, 0
                 
             diff = time.perf_counter() - start
             actions_obj = {'type': 'actions', 'speed': speed, 'steer': steer,

@@ -1,5 +1,5 @@
 Running in Docker using container name dsplay_id7_container and image name dsplay_image.
-Sending build context to Docker daemon  42.54MB
+Sending build context to Docker daemon  31.06MB
 Step 1/13 : FROM ros:noetic-robot-focal
  ---> 8b211266230d
 Step 2/13 : RUN echo "Starting..."
@@ -27,19 +27,27 @@ Step 9/13 : COPY ./networking.py .
  ---> Using cache
  ---> de08d98059ac
 Step 10/13 : COPY ./riders_client_tcp_race.py .
- ---> Using cache
- ---> 306299b3134c
+ ---> e24c59302e82
 Step 11/13 : RUN pip3 install numpy==1.17.4 pyyaml==5.3.1
- ---> Using cache
- ---> 15e1d3123f96
+ ---> Running in 760ebdafbb50
+Requirement already satisfied: numpy==1.17.4 in /usr/lib/python3/dist-packages (1.17.4)
+Requirement already satisfied: pyyaml==5.3.1 in /usr/lib/python3/dist-packages (5.3.1)
+Removing intermediate container 760ebdafbb50
+ ---> 1da39802a506
 Step 12/13 : WORKDIR /race/files/pkg
- ---> Using cache
- ---> aa0b31c66a6d
+ ---> Running in 81d184fabc22
+Removing intermediate container 81d184fabc22
+ ---> 98128bf0a242
 Step 13/13 : RUN pip3 install -r requirements.txt
- ---> Using cache
- ---> fda372bbd83f
-Successfully built fda372bbd83f
+ ---> Running in cca1dc1448cf
+Collecting Pillow==8.3.2
+  Downloading Pillow-8.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Installing collected packages: Pillow
+Successfully installed Pillow-8.3.2
+Removing intermediate container cca1dc1448cf
+ ---> ec1234c5a27d
+Successfully built ec1234c5a27d
 Successfully tagged dsplay_image:latest
 running Driver import line: from pkg.drivers import MyDriver as Driver
-Connecting to port 45009...
+Connecting to port 38163...
 got 'exit' or None: {'type': 'exit'}
