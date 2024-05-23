@@ -211,7 +211,14 @@ def compute_ego_start_states(env, racetrack, poses, ego_driver_orig, opp_start_t
     env.sim.agents[1].state[3] = 0.0
     env.sim.agents[1].state[5:] = 0.0
 
-    
+    odom = pack_odom(obs, 0)
+    x = odom['pose_x']
+    y = odom['pose_y']
+    theta = odom['pose_theta']
+    pose = np.array([x, y, theta], dtype=float)
+
+    #initial scan
+    clean_scan = scanner.scan(pose)
 
     # drive opp_driver from front position until it senses the stopped_driver (lap is completed)
     while True:
@@ -224,16 +231,6 @@ def compute_ego_start_states(env, racetrack, poses, ego_driver_orig, opp_start_t
             if len(prev_two_states) > 2:
                 prev_two_states.pop(0)
         
-        actions = np.zeros((2, 2))
-     
-        odom = pack_odom(obs, 0)
-        x = odom['pose_x']
-        y = odom['pose_y']
-        theta = odom['pose_theta']
-        pose = np.array([x, y, theta], dtype=float)
-            
-        scan = obs['scans'][0]
-        clean_scan = scanner.scan(pose)
 
         # note: driving is done using clean scan
         if hasattr(driver, 'process_observation'):
@@ -242,11 +239,22 @@ def compute_ego_start_states(env, racetrack, poses, ego_driver_orig, opp_start_t
             assert hasattr(driver, 'process_lidar')
             speed, steer = driver.process_lidar(clean_scan)
 
+        actions = np.zeros((2, 2))
+
         actions[0, 0] = steer
         actions[0, 1] = speed
         
         obs, step_reward, done, info = env.step(actions)
-        
+
+        odom = pack_odom(obs, 0)
+        x = odom['pose_x']
+        y = odom['pose_y']
+        theta = odom['pose_theta']
+        pose = np.array([x, y, theta], dtype=float)
+
+        scan = obs['scans'][0]
+        clean_scan = scanner.scan(pose)
+
         env.render(mode='human_fast')
 
         assert not obs['collisions'][0], "ego vehicle crashed in single-car race"
